@@ -1,0 +1,297 @@
+<!doctype html>
+<html lang="es"><head><meta charset="utf-8">
+<title>VisionX: propuesta de TPF</title>
+<style>
+@page { size: A4; margin: 14mm 15mm 13mm 15mm; }
+:root{ --d-bg:#ffffff; --d-panel:#ffffff; --d-band:#f5f8fa; --d-ink:#16202a; --d-mut:#566270; --d-line:#9aa6b2; --d-acc:#0b6a8a; --d-accfill:#dcedf3; --d-accfill2:#eef6f9; --d-meta:#b07000; --d-metafill:#fff4e0; --d-ext:#8a96a3; --d-extfill:#f3f5f7; --d-user:#16202a; --d-usertext:#ffffff; --d-usersub:#c9d3dc; --ink:#16202a; --mut:#566270; --line:#d5dce3; --acc:#0b6a8a; --soft:#e8f2f6; }
+*{box-sizing:border-box}
+body{font-family:"Helvetica Neue",Helvetica,Arial,sans-serif;color:var(--ink);font-size:10pt;line-height:1.42;margin:0}
+svg text{font-family:"Helvetica Neue",Helvetica,Arial,sans-serif}
+h1{font-size:30pt;margin:0;letter-spacing:-.02em}
+.sub{font-size:13pt;color:var(--mut);margin:2pt 0 8pt}
+.meta{font-size:8.8pt;color:var(--mut);border-bottom:1.5pt solid var(--ink);padding-bottom:7pt;margin-bottom:14pt}
+h2{font-size:13pt;margin:16pt 0 6pt;color:var(--acc)}
+p{margin:4pt 0}
+.lead{font-size:11.5pt;line-height:1.5}
+.quotes{display:grid;grid-template-columns:1fr 1fr;gap:8pt;margin:8pt 0}
+.q{border:1pt solid var(--line);border-radius:6pt;padding:7pt 9pt;break-inside:avoid}
+.q b{display:block;font-size:10.5pt;margin-bottom:2pt}
+.q span{color:var(--mut);font-size:9pt}
+.box{background:var(--soft);border-left:3pt solid var(--acc);padding:8pt 10pt;margin:10pt 0;break-inside:avoid}
+.pb{break-before:page}
+.mk{display:inline-block;min-width:15pt;height:15pt;line-height:15pt;border-radius:8pt;background:var(--ink);color:#fff;font-size:8pt;font-weight:700;text-align:center;padding:0 3pt;vertical-align:1pt}
+.mk.acc{background:var(--acc)} .mk.mmeta{background:#b07000} .mk.ext{background:#8a96a3}
+.cards{column-count:2;column-gap:14pt}
+.card{break-inside:avoid;display:inline-block;width:100%;margin:0 0 9pt;font-size:9.2pt;line-height:1.4}
+.card h4{font-size:10pt;margin:0 0 2pt}
+.card p{margin:2pt 0;color:#2c3843}
+.steps{counter-reset:s;list-style:none;padding:0;margin:6pt 0}
+.steps li{margin:5pt 0;padding-left:20pt;position:relative}
+.steps li::before{counter-increment:s;content:counter(s);position:absolute;left:0;top:1pt;width:14pt;height:14pt;border:1pt solid var(--ink);border-radius:50%;font-size:8pt;font-weight:700;text-align:center;line-height:13pt}
+.say{font-style:italic;color:var(--acc)}
+code{font-family:Menlo,monospace;font-size:8.6pt}
+.small{font-size:8.4pt;color:var(--mut)}
+.fig h2{margin-top:0}
+table{border-collapse:collapse;width:100%;font-size:9pt;margin:4pt 0}
+th,td{border-bottom:.5pt solid var(--line);padding:3pt 5pt;text-align:left;vertical-align:top}
+th{background:var(--soft)}
+.refs{font-size:8pt;column-count:2;column-gap:14pt;padding-left:14pt;color:#2c3843}
+</style></head><body>
+
+<h1>VisionX</h1>
+<p class="sub">Anteojos con cámara estéreo que le dicen a una persona ciega dónde están las cosas</p>
+<p class="meta">I308 Visión Artificial · UdeSA · Primavera 2026 · Propuesta de tema libre · [Nombre 1], [Nombre 2]</p>
+
+<p class="lead">Una persona con baja visión necesita saber <b>dónde</b> está un objeto, <b>a qué distancia</b> y <b>qué tiene enfrente</b>, sin mirar una pantalla. VisionX es una cámara estéreo, la ELP-USB3D1080P02 (en adelante, la ELP), montada en anteojos y conectada a una notebook. La persona aprieta un botón, habla, y el sistema responde por voz.</p>
+
+<h2>Qué se le puede pedir</h2>
+<div class="quotes">
+<div class="q"><b>“¿Dónde están mis llaves?”</b><span>Avisa con un bip cuando lo ve y guía con frases cortas hasta tenerlo enfrente.</span></div>
+<div class="q"><b>“¿Qué tan lejos está la puerta?”</b><span>“A dos metros, más o menos.” Si no está seguro, lo dice.</span></div>
+<div class="q"><b>“¿Qué hay adelante?”</b><span>Describe la escena usando objetos y distancias que el sistema midió.</span></div>
+<div class="q"><b>“Leeme esto.”</b><span>Lee carteles y etiquetas, y guía el encuadre si el texto está cortado.</span></div>
+</div>
+
+<h2>El aporte de visión artificial</h2>
+<p>Para decir distancias hace falta profundidad confiable. Hay dos fuentes con fallas opuestas:</p>
+<ul>
+<li><b>Estéreo clásico.</b> SGBM (<i>Semi-Global Block Matching</i>), un algoritmo de OpenCV, compara las dos imágenes y mide metros reales por geometría, pero falla en paredes lisas, bordes y reflejos.</li>
+<li><b>Profundidad monocular.</b> Depth Anything V2, una red preentrenada, estima la forma de toda la escena con una sola imagen, pero no sabe la escala.</li>
+</ul>
+<p>Proponemos <b>SpatialDepth-Fusion</b> (en adelante, <b>Fusion</b>), una red propia que aprende a combinarlas píxel a píxel y que además estima cuánto confía en cada valor. Después la destilamos, es decir, entrenamos una red más chica con sus salidas: <b>SpatialDepth-Lite</b> (en adelante, <b>Lite</b>), una versión liviana para correr en continuo.</p>
+<p>Fusionar monocular y estéreo ya fue estudiado con redes grandes, como MonSter y DEFOM-Stereo. Lo nuevo es probarlo con una red compacta sobre una cámara USB de bajo costo, y medir si su incertidumbre sirve para saber cuándo callarse.</p>
+<div class="box"><b>Hipótesis.</b> La fusión aprendida tiene menos error que cada fuente sola y que una regla fija de combinación, sobre todo en bordes, oclusiones y superficies sin textura. Y su incertidumbre permite callarse cuando no sabe, lo que baja el error de las distancias que sí anuncia.</div>
+
+<p>En la página siguiente está el flujo completo. Cada marca numerada se explica después.</p>
+<p class="small">Prototipo académico. No reemplaza al bastón, al perro guía ni a tecnologías validadas clínicamente.</p>
+
+<div class="pb fig">
+<h2>Flujo del sistema</h2>
+<svg viewBox="0 0 700 880" width="100%" role="img" aria-label="Flujo de VisionX">
+<defs><marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" style="fill:var(--d-mut)"/></marker></defs>
+<rect x="0" y="0" width="700" height="112" rx="8" style="fill:var(--d-band)"/>
+<text x="40" y="15" text-anchor="start" font-size="8.5" style="fill:var(--d-mut)" font-weight="700" letter-spacing="1.2">ENTRADA</text>
+<rect x="0" y="120" width="700" height="452" rx="8" style="fill:var(--d-band)"/>
+<text x="40" y="135" text-anchor="start" font-size="8.5" style="fill:var(--d-mut)" font-weight="700" letter-spacing="1.2">PERCEPCIÓN</text>
+<rect x="0" y="580" width="700" height="112" rx="8" style="fill:var(--d-band)"/>
+<text x="40" y="595" text-anchor="start" font-size="8.5" style="fill:var(--d-mut)" font-weight="700" letter-spacing="1.2">DECISIÓN</text>
+<rect x="0" y="700" width="700" height="140" rx="8" style="fill:var(--d-band)"/>
+<text x="40" y="715" text-anchor="start" font-size="8.5" style="fill:var(--d-mut)" font-weight="700" letter-spacing="1.2">SALIDA</text>
+<rect x="278" y="250" width="246" height="312" rx="8" style="fill:var(--d-panel);stroke:var(--d-acc)" stroke-width="1" stroke-dasharray="2 2"/>
+<text x="401" y="555" text-anchor="middle" font-size="8.5" style="fill:var(--d-acc)" font-weight="700" letter-spacing="1">PROFUNDIDAD · RED PROPIA</text>
+<path d="M135 88 V178" fill="none" style="stroke:var(--d-mut)" stroke-width="1.3" marker-end="url(#ar)"/>
+<path d="M540 88 V128" fill="none" style="stroke:var(--d-mut)" stroke-width="1.3" marker-end="url(#ar)"/>
+<path d="M540 162 V178" fill="none" style="stroke:var(--d-meta)" stroke-width="1.3" stroke-dasharray="4 3" marker-end="url(#ar)"/>
+<path d="M540 232 V243 M340 243 H694 M340 243 V283 M459 243 V283 M617 243 V283 M694 243 V478 H692" fill="none" style="stroke:var(--d-mut)" stroke-width="1.3"/>
+<path d="M340 276 V283" fill="none" style="stroke:var(--d-mut)" stroke-width="1.3" marker-end="url(#ar)"/>
+<path d="M459 276 V283" fill="none" style="stroke:var(--d-mut)" stroke-width="1.3" marker-end="url(#ar)"/>
+<path d="M617 276 V283" fill="none" style="stroke:var(--d-mut)" stroke-width="1.3" marker-end="url(#ar)"/>
+<path d="M694 470 V478 H692" fill="none" style="stroke:var(--d-mut)" stroke-width="1.3" marker-end="url(#ar)"/>
+<path d="M135 236 V266" fill="none" style="stroke:var(--d-mut)" stroke-width="1.3" marker-end="url(#ar)"/>
+<path d="M459 335 V358" fill="none" style="stroke:var(--d-mut)" stroke-width="1.3" marker-end="url(#ar)"/>
+<path d="M388 312 H394 V381 H398" fill="none" style="stroke:var(--d-mut)" stroke-width="1.3" stroke-dasharray="4 3" marker-end="url(#ar)"/>
+<text x="384" y="352" text-anchor="end" font-size="8.5" style="fill:var(--d-mut)" font-weight="400">píxeles</text>
+<text x="384" y="362" text-anchor="end" font-size="8.5" style="fill:var(--d-mut)" font-weight="400">confiables</text>
+<path d="M340 335 V423" fill="none" style="stroke:var(--d-mut)" stroke-width="1.3" marker-end="url(#ar)"/>
+<path d="M459 404 V423" fill="none" style="stroke:var(--d-mut)" stroke-width="1.3" marker-end="url(#ar)"/>
+<path d="M406 479 V494" fill="none" style="stroke:var(--d-acc)" stroke-width="1.3" stroke-dasharray="4 3" marker-end="url(#ar)"/>
+<text x="414" y="490" text-anchor="start" font-size="8.5" style="fill:var(--d-acc)" font-weight="400">enseña</text>
+<path d="M617 341 V356" fill="none" style="stroke:var(--d-mut)" stroke-width="1.3" marker-end="url(#ar)"/>
+<path d="M135 336 V598" fill="none" style="stroke:var(--d-mut)" stroke-width="1.3" marker-end="url(#ar)"/>
+<path d="M401 562 V598" fill="none" style="stroke:var(--d-mut)" stroke-width="1.3" marker-end="url(#ar)"/>
+<path d="M545 384 H534 V598" fill="none" style="stroke:var(--d-mut)" stroke-width="1.3" marker-end="url(#ar)"/>
+<path d="M617 500 V590 H534" fill="none" style="stroke:var(--d-mut)" stroke-width="1.3"/>
+<path d="M245 684 V738" fill="none" style="stroke:var(--d-mut)" stroke-width="1.3" marker-end="url(#ar)"/>
+<path d="M435 684 V738" fill="none" style="stroke:var(--d-mut)" stroke-width="1.3" stroke-dasharray="4 3" marker-end="url(#ar)"/>
+<path d="M520 684 V712 H617 V738" fill="none" style="stroke:var(--d-mut)" stroke-width="1.3" marker-end="url(#ar)"/>
+<path d="M617 790 V806 H245 V792" fill="none" style="stroke:var(--d-mut)" stroke-width="1.3" marker-end="url(#ar)"/>
+<path d="M160 765 H142" fill="none" style="stroke:var(--d-mut)" stroke-width="1.3" marker-end="url(#ar)"/>
+<path d="M20 765 H8 V58 H18" fill="none" style="stroke:var(--d-mut)" stroke-width="1.3" marker-end="url(#ar)"/>
+<path d="M541 640 H558" fill="none" style="stroke:var(--d-ext)" stroke-width="1.3" stroke-dasharray="4 3" marker-end="url(#ar)"/>
+<rect x="20" y="32" width="230" height="56" rx="6" style="fill:var(--d-user);stroke:var(--d-user)" stroke-width="1.1"/>
+<text x="135.0" y="57.75" text-anchor="middle" font-size="12" font-weight="700" style="fill:var(--d-usertext)">Usuario</text>
+<text x="135.0" y="71.75" text-anchor="middle" font-size="10.2" style="fill:var(--d-usersub)">aprieta el botón y habla</text>
+<rect x="400" y="32" width="280" height="56" rx="6" style="fill:var(--d-panel);stroke:var(--d-line)" stroke-width="1.1"/>
+<text x="540.0" y="57.75" text-anchor="middle" font-size="12" font-weight="700" style="fill:var(--d-ink)">Cámara estéreo ELP</text>
+<text x="540.0" y="71.75" text-anchor="middle" font-size="10.2" style="fill:var(--d-mut)">2 sensores sincronizados · 3840×1080</text>
+<circle cx="402" cy="34" r="10.5" style="fill:var(--d-ink);stroke:var(--d-bg)" stroke-width="2"/>
+<text x="402" y="38" text-anchor="middle" font-size="11" font-weight="700" style="fill:var(--d-bg)">1</text>
+<rect x="400" y="130" width="280" height="32" rx="6" style="fill:var(--d-metafill);stroke:var(--d-meta)" stroke-width="1.1" stroke-dasharray="5 3"/>
+<text x="540.0" y="150.0" text-anchor="middle" font-size="12" font-weight="700" style="fill:var(--d-ink)">Etapa B: Raspberry Pi 5 por Wi-Fi</text>
+<circle cx="402" cy="132" r="10.5" style="fill:var(--d-meta);stroke:var(--d-bg)" stroke-width="2"/>
+<text x="402" y="136" text-anchor="middle" font-size="11" font-weight="700" style="fill:var(--d-bg)">17</text>
+<rect x="400" y="180" width="280" height="52" rx="6" style="fill:var(--d-panel);stroke:var(--d-line)" stroke-width="1.1"/>
+<text x="540.0" y="203.75" text-anchor="middle" font-size="12" font-weight="700" style="fill:var(--d-ink)">Calibración y rectificación</text>
+<text x="540.0" y="217.75" text-anchor="middle" font-size="10.2" style="fill:var(--d-mut)">ChArUco · par 1280×720 + izq. 1080p</text>
+<circle cx="402" cy="182" r="10.5" style="fill:var(--d-ink);stroke:var(--d-bg)" stroke-width="2"/>
+<text x="402" y="186" text-anchor="middle" font-size="11" font-weight="700" style="fill:var(--d-bg)">2</text>
+<rect x="20" y="180" width="230" height="56" rx="6" style="fill:var(--d-panel);stroke:var(--d-line)" stroke-width="1.1"/>
+<text x="135.0" y="205.75" text-anchor="middle" font-size="12" font-weight="700" style="fill:var(--d-ink)">Voz a texto</text>
+<text x="135.0" y="219.75" text-anchor="middle" font-size="10.2" style="fill:var(--d-mut)">Silero VAD + Whisper small</text>
+<circle cx="22" cy="182" r="10.5" style="fill:var(--d-ink);stroke:var(--d-bg)" stroke-width="2"/>
+<text x="22" y="186" text-anchor="middle" font-size="11" font-weight="700" style="fill:var(--d-bg)">12</text>
+<rect x="20" y="268" width="230" height="68" rx="6" style="fill:var(--d-panel);stroke:var(--d-line)" stroke-width="1.1"/>
+<text x="135.0" y="293.5" text-anchor="middle" font-size="12" font-weight="700" style="fill:var(--d-ink)">Entender la orden</text>
+<text x="135.0" y="307.5" text-anchor="middle" font-size="10.2" style="fill:var(--d-mut)">reglas → Intern-Decision 0.8B</text>
+<text x="135.0" y="320.0" text-anchor="middle" font-size="10.2" style="fill:var(--d-mut)">orden + objeto + confianza</text>
+<circle cx="22" cy="270" r="10.5" style="fill:var(--d-ink);stroke:var(--d-bg)" stroke-width="2"/>
+<text x="22" y="274" text-anchor="middle" font-size="11" font-weight="700" style="fill:var(--d-bg)">13</text>
+<rect x="292" y="285" width="96" height="50" rx="6" style="fill:var(--d-panel);stroke:var(--d-line)" stroke-width="1.1"/>
+<text x="340.0" y="307.75" text-anchor="middle" font-size="12" font-weight="700" style="fill:var(--d-ink)">SGBM</text>
+<text x="340.0" y="321.75" text-anchor="middle" font-size="10.2" style="fill:var(--d-mut)">estéreo clásico</text>
+<circle cx="294" cy="287" r="10.5" style="fill:var(--d-ink);stroke:var(--d-bg)" stroke-width="2"/>
+<text x="294" y="291" text-anchor="middle" font-size="11" font-weight="700" style="fill:var(--d-bg)">3</text>
+<rect x="400" y="285" width="118" height="50" rx="6" style="fill:var(--d-accfill2);stroke:var(--d-acc)" stroke-width="1.3"/>
+<text x="459.0" y="307.75" text-anchor="middle" font-size="12" font-weight="700" style="fill:var(--d-ink)">Depth Anything V2</text>
+<text x="459.0" y="321.75" text-anchor="middle" font-size="10.2" style="fill:var(--d-mut)">monocular, congelada</text>
+<circle cx="402" cy="287" r="10.5" style="fill:var(--d-acc);stroke:var(--d-bg)" stroke-width="2"/>
+<text x="402" y="291" text-anchor="middle" font-size="11" font-weight="700" style="fill:var(--d-bg)">4</text>
+<rect x="400" y="360" width="118" height="44" rx="6" style="fill:var(--d-accfill2);stroke:var(--d-acc)" stroke-width="1.3"/>
+<text x="459.0" y="379.75" text-anchor="middle" font-size="12" font-weight="700" style="fill:var(--d-ink)">Alineación</text>
+<text x="459.0" y="393.75" text-anchor="middle" font-size="10.2" style="fill:var(--d-mut)">s·m + t por RANSAC</text>
+<circle cx="402" cy="362" r="10.5" style="fill:var(--d-acc);stroke:var(--d-bg)" stroke-width="2"/>
+<text x="402" y="366" text-anchor="middle" font-size="11" font-weight="700" style="fill:var(--d-bg)">5</text>
+<rect x="294" y="425" width="224" height="54" rx="6" style="fill:var(--d-accfill);stroke:var(--d-acc)" stroke-width="1.8"/>
+<text x="406.0" y="443.5" text-anchor="middle" font-size="12" font-weight="700" style="fill:var(--d-ink)">SpatialDepth-Fusion</text>
+<text x="406.0" y="457.5" text-anchor="middle" font-size="10.2" style="fill:var(--d-mut)">U-Net propia</text>
+<text x="406.0" y="470.0" text-anchor="middle" font-size="10.2" style="fill:var(--d-mut)">disparidad + incertidumbre b</text>
+<circle cx="296" cy="427" r="10.5" style="fill:var(--d-acc);stroke:var(--d-bg)" stroke-width="2"/>
+<text x="296" y="431" text-anchor="middle" font-size="11" font-weight="700" style="fill:var(--d-bg)">6</text>
+<rect x="294" y="496" width="224" height="44" rx="6" style="fill:var(--d-accfill);stroke:var(--d-acc)" stroke-width="1.8"/>
+<text x="406.0" y="515.75" text-anchor="middle" font-size="12" font-weight="700" style="fill:var(--d-ink)">SpatialDepth-Lite</text>
+<text x="406.0" y="529.75" text-anchor="middle" font-size="10.2" style="fill:var(--d-mut)">destilada, sin Depth Anything</text>
+<circle cx="296" cy="498" r="10.5" style="fill:var(--d-acc);stroke:var(--d-bg)" stroke-width="2"/>
+<text x="296" y="502" text-anchor="middle" font-size="11" font-weight="700" style="fill:var(--d-bg)">7</text>
+<rect x="545" y="285" width="145" height="56" rx="6" style="fill:var(--d-panel);stroke:var(--d-line)" stroke-width="1.1"/>
+<text x="617.5" y="310.75" text-anchor="middle" font-size="12" font-weight="700" style="fill:var(--d-ink)">Detectar objetos</text>
+<text x="617.5" y="324.75" text-anchor="middle" font-size="10.2" style="fill:var(--d-mut)">YOLO11-seg + YOLO-World</text>
+<circle cx="547" cy="287" r="10.5" style="fill:var(--d-ink);stroke:var(--d-bg)" stroke-width="2"/>
+<text x="547" y="291" text-anchor="middle" font-size="11" font-weight="700" style="fill:var(--d-bg)">8</text>
+<rect x="545" y="358" width="145" height="56" rx="6" style="fill:var(--d-panel);stroke:var(--d-line)" stroke-width="1.1"/>
+<text x="617.5" y="383.75" text-anchor="middle" font-size="12" font-weight="700" style="fill:var(--d-ink)">Seguir</text>
+<text x="617.5" y="397.75" text-anchor="middle" font-size="10.2" style="fill:var(--d-mut)">ByteTrack + huella DINOv2</text>
+<circle cx="547" cy="360" r="10.5" style="fill:var(--d-ink);stroke:var(--d-bg)" stroke-width="2"/>
+<text x="547" y="364" text-anchor="middle" font-size="11" font-weight="700" style="fill:var(--d-bg)">9</text>
+<rect x="545" y="448" width="145" height="52" rx="6" style="fill:var(--d-panel);stroke:var(--d-line)" stroke-width="1.1"/>
+<text x="617.5" y="471.75" text-anchor="middle" font-size="12" font-weight="700" style="fill:var(--d-ink)">Leer texto</text>
+<text x="617.5" y="485.75" text-anchor="middle" font-size="10.2" style="fill:var(--d-mut)">PaddleOCR a 1080p</text>
+<circle cx="547" cy="450" r="10.5" style="fill:var(--d-ink);stroke:var(--d-bg)" stroke-width="2"/>
+<text x="547" y="454" text-anchor="middle" font-size="11" font-weight="700" style="fill:var(--d-bg)">10</text>
+<rect x="20" y="600" width="521" height="84" rx="6" style="fill:var(--d-panel);stroke:var(--d-ink)" stroke-width="1.6"/>
+<circle cx="22" cy="602" r="10.5" style="fill:var(--d-ink);stroke:var(--d-bg)" stroke-width="2"/><text x="22" y="606" text-anchor="middle" font-size="11" font-weight="700" style="fill:var(--d-bg)">14</text>
+<text x="280" y="625" text-anchor="middle" font-size="12" style="fill:var(--d-ink)" font-weight="700">Controlador: máquina de estados</text>
+<rect x="36" y="640" width="62" height="26" rx="13" style="fill:var(--d-accfill2);stroke:var(--d-acc)" stroke-width=".8"/>
+<text x="67.0" y="657" text-anchor="middle" font-size="10.5" style="fill:var(--d-acc)" font-weight="600">Buscar</text>
+<rect x="106" y="640" width="62" height="26" rx="13" style="fill:var(--d-accfill2);stroke:var(--d-acc)" stroke-width=".8"/>
+<text x="137.0" y="657" text-anchor="middle" font-size="10.5" style="fill:var(--d-acc)" font-weight="600">Elegir</text>
+<rect x="176" y="640" width="62" height="26" rx="13" style="fill:var(--d-accfill2);stroke:var(--d-acc)" stroke-width=".8"/>
+<text x="207.0" y="657" text-anchor="middle" font-size="10.5" style="fill:var(--d-acc)" font-weight="600">Guiar</text>
+<rect x="246" y="640" width="70" height="26" rx="13" style="fill:var(--d-accfill2);stroke:var(--d-acc)" stroke-width=".8"/>
+<text x="281.0" y="657" text-anchor="middle" font-size="10.5" style="fill:var(--d-acc)" font-weight="600">Distancia</text>
+<rect x="324" y="640" width="70" height="26" rx="13" style="fill:var(--d-accfill2);stroke:var(--d-acc)" stroke-width=".8"/>
+<text x="359.0" y="657" text-anchor="middle" font-size="10.5" style="fill:var(--d-acc)" font-weight="600">Describir</text>
+<rect x="402" y="640" width="62" height="26" rx="13" style="fill:var(--d-accfill2);stroke:var(--d-acc)" stroke-width=".8"/>
+<text x="433.0" y="657" text-anchor="middle" font-size="10.5" style="fill:var(--d-acc)" font-weight="600">Leer</text>
+<rect x="472" y="640" width="62" height="26" rx="13" style="fill:var(--d-metafill);stroke:var(--d-meta)" stroke-width=".8"/>
+<text x="503.0" y="657" text-anchor="middle" font-size="10.5" style="fill:var(--d-meta)" font-weight="600">Alerta</text>
+<rect x="560" y="604" width="130" height="72" rx="6" style="fill:var(--d-extfill);stroke:var(--d-ext)" stroke-width="1.1" stroke-dasharray="5 3"/>
+<text x="625.0" y="631.5" text-anchor="middle" font-size="12" font-weight="700" style="fill:var(--d-ink)">Extensiones</text>
+<text x="625.0" y="645.5" text-anchor="middle" font-size="10.2" style="fill:var(--d-mut)">memoria de objetos</text>
+<text x="625.0" y="658.0" text-anchor="middle" font-size="10.2" style="fill:var(--d-mut)">mapa 3D</text>
+<circle cx="562" cy="606" r="10.5" style="fill:var(--d-ext);stroke:var(--d-bg)" stroke-width="2"/>
+<text x="562" y="610" text-anchor="middle" font-size="11" font-weight="700" style="fill:var(--d-bg)">18</text>
+<rect x="20" y="740" width="120" height="50" rx="6" style="fill:var(--d-panel);stroke:var(--d-line)" stroke-width="1.1"/>
+<text x="80.0" y="762.75" text-anchor="middle" font-size="12" font-weight="700" style="fill:var(--d-ink)">Auriculares</text>
+<text x="80.0" y="776.75" text-anchor="middle" font-size="10.2" style="fill:var(--d-mut)">vuelven al usuario</text>
+<rect x="160" y="740" width="170" height="50" rx="6" style="fill:var(--d-panel);stroke:var(--d-line)" stroke-width="1.1"/>
+<text x="245.0" y="762.75" text-anchor="middle" font-size="12" font-weight="700" style="fill:var(--d-ink)">Voz</text>
+<text x="245.0" y="776.75" text-anchor="middle" font-size="10.2" style="fill:var(--d-mut)">Piper TTS local</text>
+<circle cx="162" cy="742" r="10.5" style="fill:var(--d-ink);stroke:var(--d-bg)" stroke-width="2"/>
+<text x="162" y="746" text-anchor="middle" font-size="11" font-weight="700" style="fill:var(--d-bg)">15</text>
+<rect x="350" y="740" width="170" height="50" rx="6" style="fill:var(--d-panel);stroke:var(--d-line)" stroke-width="1.1"/>
+<text x="435.0" y="762.75" text-anchor="middle" font-size="12" font-weight="700" style="fill:var(--d-ink)">Dashboard</text>
+<text x="435.0" y="776.75" text-anchor="middle" font-size="10.2" style="fill:var(--d-mut)">mapas en vivo + nube 3D</text>
+<circle cx="352" cy="742" r="10.5" style="fill:var(--d-ink);stroke:var(--d-bg)" stroke-width="2"/>
+<text x="352" y="746" text-anchor="middle" font-size="11" font-weight="700" style="fill:var(--d-bg)">16</text>
+<rect x="545" y="740" width="145" height="50" rx="6" style="fill:var(--d-panel);stroke:var(--d-line)" stroke-width="1.1"/>
+<text x="617.5" y="762.75" text-anchor="middle" font-size="12" font-weight="700" style="fill:var(--d-ink)">Describir escena</text>
+<text x="617.5" y="776.75" text-anchor="middle" font-size="10.2" style="fill:var(--d-mut)">VLM por API</text>
+<circle cx="547" cy="742" r="10.5" style="fill:var(--d-ink);stroke:var(--d-bg)" stroke-width="2"/>
+<text x="547" y="746" text-anchor="middle" font-size="11" font-weight="700" style="fill:var(--d-bg)">11</text>
+<rect x="20" y="848" width="16" height="12" rx="3" style="fill:var(--d-accfill);stroke:var(--d-acc)"/>
+<text x="42" y="858" text-anchor="start" font-size="10" style="fill:var(--d-mut)" font-weight="400">red neuronal propia o usada por ella</text>
+<rect x="251.6" y="848" width="16" height="12" rx="3" style="fill:var(--d-metafill);stroke:var(--d-meta)" stroke-dasharray="4 2"/>
+<text x="273.6" y="858" text-anchor="start" font-size="10" style="fill:var(--d-mut)" font-weight="400">meta / etapa B</text>
+<rect x="360.0" y="848" width="16" height="12" rx="3" style="fill:var(--d-extfill);stroke:var(--d-ext)" stroke-dasharray="4 2"/>
+<text x="382.0" y="858" text-anchor="start" font-size="10" style="fill:var(--d-mut)" font-weight="400">extensión</text>
+</svg>
+<p class="small" style="margin-top:8pt"><b>Figura 1.</b> Flujo del sistema, de arriba hacia abajo. La voz (izquierda) y la imagen (derecha) se procesan en paralelo y llegan al controlador, que decide según el modo. La respuesta vuelve por voz, y el dashboard muestra todo en pantalla para evaluar. En azul, la parte de redes, que es el aporte del trabajo. Siglas: VAD, detector de actividad de voz; TTS, síntesis de voz; OCR, reconocimiento óptico de caracteres; VLM, modelo de visión y lenguaje; RANSAC, ajuste robusto que ignora valores atípicos; b, incertidumbre estimada por Fusion (marca 6). Los modelos con nombre propio se presentan en la ficha de cada marca.</p>
+</div>
+
+<h2 class="pb">Un recorrido: “¿dónde está mi celular?”</h2>
+<ol class="steps">
+<li>La persona aprieta el botón y habla. <span class="mk ">12</span> transcribe y <span class="mk ">13</span> entiende <i>buscar(celular)</i>.</li>
+<li>El controlador <span class="mk ">14</span> pasa a <b>Buscar</b>. <span class="mk ">8</span> detecta tres celulares sobre la mesa y <span class="mk ">9</span> los sigue.</li>
+<li>Como hay varios, pasa a <b>Elegir</b>: <span class="say">“Veo tres celulares: izquierda, enfrente y derecha. ¿Cuál es el tuyo?”</span> La persona contesta <span class="say">“el de funda roja”</span>. <span class="mk ">11</span> distingue cuál es y <span class="mk ">13</span> resuelve la respuesta.</li>
+<li>Pasa a <b>Guiar</b>. <span class="mk acc">6</span> da la distancia dentro de la silueta del objeto y <span class="mk ">15</span> dice <span class="say">“a la derecha, a un metro”</span>.</li>
+<li>Cada 1,5 s actualiza hasta que la persona lo tiene enfrente: <span class="say">“Lo tenés adelante, a 30 centímetros.”</span> Si gira para el otro lado y lo pierde: <span class="say">“Lo perdí de vista, sigo buscando.”</span></li>
+</ol>
+
+<h2>Qué es cada marca</h2>
+<div class="cards">
+<div class="card"><h4><span class="mk ">1</span> Cámara estéreo ELP-USB3D1080P02</h4><p>Dos sensores sincronizados que salen lado a lado en una sola imagen de 3840×1080, comprimida como MJPEG (cada cuadro, un JPEG) por USB 2.0. La separación entre lentes, que llamamos B, es de unos 59 mm, y la distancia focal en píxeles, f, de unos 606 px.</p><p>Si llamamos d a la disparidad, la diferencia de columnas con que un punto aparece en cada imagen, su profundidad Z sale de <code>Z = f·B/d</code>. El error crece con el cuadrado de la distancia: 4 cm a 1 m, 17 cm a 2 m. Por eso el rango de uso es de 0,5 a 3 m.</p></div>
+<div class="card"><h4><span class="mk ">2</span> Calibración y rectificación</h4><p>Tablero ChArUco (un damero con marcadores numerados) de 11×8 cuadrados de 30 mm, en A3. Intrínsecos por cámara, luego estéreo con intrínsecos fijos, y rectificación. Se usan tres sets: calibrar (60 a 80 vistas), validar (20, nunca usadas para calibrar) y distancias a 1, 2 y 3 m medidas con cinta.</p><p>Salen dos imágenes: el par rectificado reducido a 1280×720 para profundidad, y la imagen izquierda a 1080p para detectar y leer. Metas: error de reproyección menor a 0,3 px y escala con menos de 0,5 % de error. El mismo tablero da la profundidad verdadera para evaluar en nuestra cámara.</p></div>
+<div class="card"><h4><span class="mk ">3</span> SGBM: estéreo clásico</h4><p>SGBM con chequeo de consistencia entre la imagen izquierda y la derecha. Da metros reales.</p><p>Falla en paredes lisas, bordes, zonas tapadas para un ojo y reflejos. Además de la disparidad, aporta mapas de validez, consistencia y error que usa la red.</p></div>
+<div class="card"><h4><span class="mk acc">4</span> Depth Anything V2 Small</h4><p>Red preentrenada (NeurIPS 2024, 24,8 M de parámetros, licencia Apache-2.0) que estima profundidad con una sola imagen. Se usa congelada, sin reentrenar.</p><p>Entiende la forma de la escena en todas partes, incluso donde SGBM falla, pero no sabe la escala: no da metros.</p></div>
+<div class="card"><h4><span class="mk acc">5</span> Alineación</h4><p>Lleva la salida de Depth Anything a la escala de SGBM con <code>d ≈ s·m + t</code>, donde m es la salida de Depth Anything, y s y t una escala y un corrimiento ajustados con RANSAC sobre los píxeles donde SGBM es confiable.</p><p>Si hay menos de 500 píxeles confiables, el frame se marca como no alineado.</p></div>
+<div class="card"><h4><span class="mk acc">6</span> SpatialDepth-Fusion: el aporte principal</h4><p>U-Net propia (una red convolucional que achica y vuelve a agrandar la imagen) de unos 2 M de parámetros, que recibe 10 canales: imagen, SGBM y sus mapas de confianza, y Depth Anything alineado. Aprende píxel a píxel cuándo creerle a cada fuente.</p><p>Predice una corrección sobre una regla fija (SGBM si es confiable, si no Depth Anything), así que arranca igual a esa regla y lo que aprende es la corrección. Una segunda salida estima, para cada píxel, cuánto espera equivocarse la red: el parámetro de escala de una distribución de Laplace alrededor de la disparidad predicha. A esa incertidumbre la llamamos <i>b</i>. Cuando b es alta, el sistema dice “no estoy seguro” en vez de inventar metros. Se entrena con InStereo2K y se evalúa en Middlebury y ETH3D, datasets públicos de pares estéreo con profundidad medida, y en nuestra cámara. Fusionar mono y estéreo ya existe (MonSter, DEFOM-Stereo): lo propio es hacerlo con una red chica, con incertidumbre calibrada y en una cámara USB barata. Una variante, que llamamos <b>Fusion-FFS</b>, aplica la misma red sobre la disparidad de Fast-FoundationStereo, una red estéreo reciente (CVPR 2026), para ver si la red todavía mejora el error y la incertidumbre.</p></div>
+<div class="card"><h4><span class="mk acc">7</span> SpatialDepth-Lite: destilación</h4><p>La misma red sin Depth Anything, que es lo más caro de correr. Fusion le enseña como red maestra usando unos 5 000 pares de video propio sin etiquetar, descartando lo que Fusion marca como incierto.</p><p>Lite corre en continuo (alerta, wearable). Fusion se usa en pedidos puntuales, como medir una distancia.</p></div>
+<div class="card"><h4><span class="mk ">8</span> Detectar objetos</h4><p>YOLO11n-seg, un detector y segmentador en tiempo real, para las 80 clases comunes del dataset COCO. YOLO-World, un detector al que se le da el nombre del objeto como texto, para objetos fuera de esa lista, como “llaves” o “billetera”, nombrados por texto.</p><p>Un objeto cuenta como visto si aparece en 3 de 5 frames, para evitar falsos avisos.</p></div>
+<div class="card"><h4><span class="mk ">9</span> Seguir el objeto</h4><p>ByteTrack, un algoritmo de seguimiento, le da a cada objeto un número estable entre frames. Para el objeto elegido se guarda además una huella: 384 números que describen su apariencia, calculados con DINOv2, una red de visión preentrenada, con la que se lo reconoce si se pierde y vuelve.</p><p>Si el objeto sale de cuadro, la guía se suspende y vuelve a buscar. Sin sensor de movimiento no se inventa dónde quedó. Con varios iguales: “Veo tres celulares: izquierda, enfrente y derecha. ¿Cuál es el tuyo?”</p></div>
+<div class="card"><h4><span class="mk ">10</span> Leer texto</h4><p>Elige el frame más nítido y lo pasa a PaddleOCR, una librería de OCR, a 1080p.</p><p>Si el texto está cortado o borroso, guía el encuadre: “movelo a la izquierda”, “acercalo”.</p></div>
+<div class="card"><h4><span class="mk ">11</span> Describir escena (VLM)</h4><p>Modelo de visión y lenguaje, consultado por internet. Recibe la imagen y la lista de objetos que ya medimos (qué son, dónde están, a qué distancia), para que no invente.</p><p>También distingue objetos repetidos con recortes numerados (“el de funda roja”). Sin conexión responde con una plantilla. No identifica caras.</p></div>
+<div class="card"><h4><span class="mk ">12</span> Voz a texto</h4><p>Botón para hablar (barra espaciadora o control Bluetooth). Silero, un VAD, detecta cuándo termina la frase, y faster-whisper small, una versión optimizada del reconocedor de voz Whisper, la transcribe, con una lista de órdenes y objetos para que acierte más.</p></div>
+<div class="card"><h4><span class="mk ">13</span> Entender la orden</h4><p>Primero reglas simples (“buscá X”, “¿qué tan lejos?”). Si no alcanzan, Intern-Decision 0.8B, un modelo de decisión abierto que corre en la notebook, elige la orden entre opciones fijas y da su probabilidad. Si la probabilidad es menor a 70 %, repregunta.</p><p>Se prueba primero con 50 frases. Si no rinde, la alternativa es un modelo de lenguaje general (LLM) por internet que devuelve la orden en formato JSON.</p></div>
+<div class="card"><h4><span class="mk ">14</span> Controlador</h4><p>Máquina de estados que coordina todo. Cada servicio corre en su hilo y lee siempre el último frame. Una cola de audio con prioridades permite cortar con el botón en cualquier momento.</p><p><b>Buscar:</b> bip apenas lo ve, luego dirección y distancia. <b>Elegir:</b> si hay varios iguales, pregunta cuál. <b>Guiar:</b> actualiza cada 1,5 s. <b>Distancia:</b> redondea según la incertidumbre. <b>Describir</b> y <b>Leer</b>. <b>Alerta</b> (meta): avisa de obstáculos cercanos con Lite y el plano del piso. Antes de hablar, un único criterio de confianza decide entre decir metros, decir solo la dirección, pedir reencuadrar o abstenerse.</p></div>
+<div class="card"><h4><span class="mk ">15</span> Voz</h4><p>Piper, un TTS neuronal, corre en la notebook. Las frases frecuentes quedan pregrabadas para responder sin demora.</p></div>
+<div class="card"><h4><span class="mk ">16</span> Dashboard</h4><p>Pantalla para el equipo y el jurado, no para el usuario. Muestra en vivo la imagen con detecciones, SGBM, Depth Anything, Fusion con su incertidumbre y Lite, cada mapa con su edad y tiempo de cálculo. Incluye la nube de puntos 3D del frame actual.</p><p>Tiene dos modos: <b>en vivo</b>, donde cada mapa va a su ritmo, y <b>replay</b>, donde todos los métodos procesan el mismo frame grabado para compararlos de forma justa. La nube 3D es por frame: acumular un mapa requiere estimar el movimiento y queda como extensión.</p></div>
+<div class="card"><h4><span class="mk mmeta">17</span> Wearable (etapa B)</h4><p>Una Raspberry Pi 5 envía el video por Wi-Fi de 5 GHz a la notebook y recibe el audio. Siempre manda el último frame y descarta los viejos. Se prueban temprano los AirPods: el micrófono por Bluetooth cambia de perfil y puede degradar el audio.</p><p>Se hace si llegamos. Se mide la latencia contra el cable USB.</p></div>
+<div class="card"><h4><span class="mk ext">18</span> Extensiones</h4><p>Memoria de objetos (“¿dónde dejé las llaves?”), registrar objetos propios por su huella, y un mapa 3D de la habitación.</p></div>
+</div>
+
+<h2>Cómo se evalúa la red</h2>
+<table>
+<tr><th>Qué</th><th>Detalle</th></tr>
+<tr><td>Datos</td><td>InStereo2K (2 050 pares de interiores) para entrenar y validar. Middlebury 2014 (23 pares), ETH3D (27 pares) y 30 a 50 escenas propias con el tablero para testear.</td></tr>
+<tr><td>Contra qué se compara</td><td>SGBM solo, SGBM con un filtro de suavizado WLS (mínimos cuadrados ponderados), Depth Anything alineado solo y métrico, y la regla fija de combinación, que es el rival principal. FoundationStereo y Fast-FoundationStereo, redes estéreo grandes, como techo. Todos sobre los mismos frames y el mismo hardware.</td></tr>
+<tr><td>Métricas</td><td>Error promedio de disparidad y porcentaje de píxeles con más de 2 px de error, en cuatro zonas: global, bordes, oclusiones y sin textura. Error en metros por rango. Porcentaje de píxeles con respuesta, para que nadie gane descartando lo difícil. Calidad de la incertidumbre: si ordena bien los errores y si sus intervalos contienen el valor real. Latencia mediana y P95.</td></tr>
+<tr><td>Ablaciones</td><td>Sin canales monoculares, sin RGB, sin canales clásicos, sin incertidumbre, con y sin una compuerta que limite la corrección, con y sin aumentos que imiten la compresión de la ELP, y Lite con y sin destilación.</td></tr>
+<tr><td>Variante</td><td>Fusion-FFS: la misma red con Fast-FoundationStereo en lugar de SGBM, comparada contra Fast-FoundationStereo solo.</td></tr>
+<tr><td>En la cámara real</td><td>Distancia a 10 objetos a 1, 2 y 3 m, con y sin abstención.</td></tr>
+</table>
+<div class="box"><b>Criterio de éxito, fijado antes de entrenar.</b> Fusion le gana a la mejor alternativa en bordes, oclusiones y zonas sin textura. Y en nuestra cámara, callarse cuando la incertidumbre es alta reduce el error de las distancias anunciadas. También se muestran los casos donde Fusion empeora.</div>
+
+<h2>Referencias principales</h2>
+<ol class="refs">
+<li>Hirschmüller. Stereo processing by semiglobal matching and mutual information. TPAMI, 2008.</li>
+<li>Zhang. A flexible new technique for camera calibration. TPAMI, 2000.</li>
+<li>Garrido-Jurado et al. Automatic generation and detection of highly reliable fiducial markers. Pattern Recognition, 2014.</li>
+<li>Yang et al. Depth Anything V2. NeurIPS, 2024.</li>
+<li>Ronneberger et al. U-Net. MICCAI, 2015.</li>
+<li>Kendall, Gal. What uncertainties do we need in Bayesian deep learning for computer vision? NeurIPS, 2017.</li>
+<li>Hinton et al. Distilling the knowledge in a neural network. NeurIPS Workshop, 2015.</li>
+<li>Poggi et al. On the confidence of stereo matching in a deep-learning era. TPAMI, 2022.</li>
+<li>Cheng et al. MonSter: Marry monodepth to stereo unleashes power. CVPR, 2025.</li>
+<li>Wen et al. FoundationStereo. CVPR, 2025.</li>
+<li>Bao et al. InStereo2K. Sci. China Inf. Sci., 2020.</li>
+<li>Scharstein et al. High-resolution stereo datasets with subpixel-accurate ground truth. GCPR, 2014.</li>
+<li>Schöps et al. A multi-view stereo benchmark. CVPR, 2017.</li>
+<li>Jiang et al. DEFOM-Stereo. CVPR, 2025.</li>
+<li>Wen et al. Fast-FoundationStereo. CVPR, 2026.</li>
+<li>Cheng et al. YOLO-World. CVPR, 2024.</li>
+<li>Zhang et al. ByteTrack. ECCV, 2022.</li>
+<li>Oquab et al. DINOv2. TMLR, 2024.</li>
+<li>Radford et al. Robust speech recognition via large-scale weak supervision. ICML, 2023.</li>
+</ol>
+<p class="small">Sin referato: Intern-Decision (arXiv, 2026), PaddleOCR y Piper (documentación técnica).</p>
+</body></html>

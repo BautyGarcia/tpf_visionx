@@ -1,0 +1,26 @@
+# Configuración por defecto de VisionX. Los valores se cambian acá, no en el código.
+
+camera:
+  device: 0                 # índice de la ELP en OpenCV (cada uno lo pisa en configs/local.yaml)
+  backend: auto             # auto | avfoundation (macOS) | dshow | msmf (Windows) | v4l2 (Linux)
+  capture: [3840, 1080]     # par lado a lado, MJPEG
+  fourcc: MJPG
+  fps: 30
+  calibration: null         # ruta al YAML de calibración elegido (configs/calib/...)
+
+depth:
+  compute: [1280, 720]      # resolución por ojo para profundidad
+  range_m: [0.5, 3.0]       # rango donde se anuncian metros
+  sgbm:
+    num_disparities: 96     # mínimo ~0,25 m a 720p
+    block_size: 5
+
+calibration:
+  board: charuco
+  squares: [11, 8]
+  square_m: 0.030           # reemplazar por la medida real con regla
+  marker_m: 0.022
+  dictionary: DICT_5X5_100
+
+audio:
+  speech_rate: 1.0

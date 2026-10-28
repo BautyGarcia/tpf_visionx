@@ -1,0 +1,14 @@
+#!/bin/sh
+# 1. Los agentes nunca figuran como autores: se borran sus líneas de coautoría y firmas.
+tmp="$1.tmp"
+grep -viE '^(Co-Authored-By:.*(claude|anthropic|openai|codex|copilot|gemini|cursor|noreply@)|.*Generated with \[?Claude)' "$1" > "$tmp" || true
+mv "$tmp" "$1"
+
+# 2. Formato: tipo(área): descripción   ej. feat(camera): separar par estéreo
+msg=$(head -n1 "$1")
+case "$msg" in Merge*|Revert*|fixup!*|squash!*) exit 0 ;; esac
+if ! echo "$msg" | grep -qE '^(feat|fix|test|docs|refactor|chore|exp)(\([a-z0-9/_-]+\))?: .{3,}'; then
+  echo "Mensaje de commit: 'tipo(área): descripción'"
+  echo "   tipos: feat fix test docs refactor chore exp. Ej: feat(camera): separar par estéreo"
+  exit 1
+fi

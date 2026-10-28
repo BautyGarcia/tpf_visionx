@@ -1,0 +1,12 @@
+# Saltos de línea: todo el texto se guarda con LF en el repo, también desde Windows.
+* text=auto eol=lf
+
+# Los hooks y scripts de shell tienen que ser LF siempre, o fallan en Git Bash.
+.githooks/* text eol=lf
+*.sh text eol=lf
+
+# Binarios
+*.pdf binary
+*.png binary
+*.jpg binary
+*.jpeg binary

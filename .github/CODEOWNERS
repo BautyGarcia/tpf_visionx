@@ -1,0 +1,7 @@
+# Quién revisa qué. Reemplazar <usuario-a> y <usuario-b> por los usuarios de GitHub
+# (sin los signos < >) y descomentar cuando el repo esté en GitHub.
+#
+# *                         <usuario-a> <usuario-b>
+# /src/visionx/shared/      <usuario-a> <usuario-b>
+# /src/visionx/depth/       <usuario-a>
+# /src/visionx/camera/      <usuario-b>

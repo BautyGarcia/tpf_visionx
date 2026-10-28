@@ -1,0 +1,87 @@
+# =====================================================================
+# VisionX .gitignore
+# Regla general: a git va código, configs, docs y fixtures chicos.
+# Nunca: entornos, datos, pesos, grabaciones, secretos ni archivos locales.
+# =====================================================================
+
+# ---------- Python ----------
+__pycache__/
+*.py[cod]
+*.egg-info/
+.eggs/
+build/
+dist/
+.venv/
+venv/
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+.coverage
+htmlcov/
+.ipynb_checkpoints/
+
+# ---------- Secretos y config local ----------
+.env
+.env.*
+!.env.example
+*.key
+*.pem
+# overrides personales (ej. índice de cámara de cada uno)
+configs/local*.yaml
+
+# ---------- Datos y datasets ----------
+# Los datasets se describen en datasets/*.yaml (manifests con hashes), no se suben.
+data/
+datasets/**/raw/
+# pares grabados de la ELP para replay
+recordings/
+# capturas y resultados de cada sesión de calibración
+calib_sessions/
+*.mp4
+*.avi
+*.mov
+*.mkv
+
+# ---------- Modelos y experimentos ----------
+checkpoints/
+weights/
+runs/
+outputs/
+mlruns/
+wandb/
+lightning_logs/
+*.pt
+*.pth
+*.ckpt
+*.onnx
+*.engine
+*.safetensors
+*.npz
+*.npy
+*.pkl
+*.h5
+
+# Excepción: fixtures chicos para tests (< 1 MB cada uno)
+!tests/fixtures/
+!tests/fixtures/**
+
+# ---------- Logs de ejecución (no el registro de trabajo docs/log/) ----------
+*.log
+logs/
+
+# ---------- Editores y sistema ----------
+.DS_Store
+.idea/
+.vscode/*
+!.vscode/extensions.json
+*.swp
+*~
+
+# ---------- Agentes ----------
+.claude/settings.local.json
+.claude/worktrees/
+CLAUDE.local.md
+
+# ---------- Referencias locales pesadas ----------
+# TP2 viejo (256 MB, con su propio .venv)
+docs/i308-calib-tp2-antiguo/
