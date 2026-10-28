@@ -8,7 +8,7 @@ Para pedirle algo al otro, se agrega en la sección **Pedidos** del otro, con qu
 
 ---
 
-## A: datos, red y evaluación
+## A: datos, red y evaluación (Bauty)
 
 ### En curso / pendientes
 - [pendiente] A01 · Descargar InStereo2K y armar el manifest con hashes · — ·
@@ -21,7 +21,7 @@ Para pedirle algo al otro, se agrega en la sección **Pedidos** del otro, con qu
 
 ---
 
-## B: cámara, aplicación y hardware
+## B: cámara, aplicación y hardware (TomaasGonzalezzz)
 
 ### En curso / pendientes
 - [pendiente] B01 · Listar modos reales de la ELP (resolución, FPS, formato) · — ·
@@ -36,3 +36,4 @@ Para pedirle algo al otro, se agrega en la sección **Pedidos** del otro, con qu
 
 ## Compartidas
 - [hecha] C01 · Esqueleto del repo, entorno y protocolo de trabajo · main ·
+- [en revisión] C02 · Asignar roles A y B, CODEOWNERS, y GPU: sin NVIDIA, CUDA en VM · a/C02-roles ·

@@ -11,8 +11,8 @@ es dueña de un área:
 
 | Rol | Persona | Área | Carpetas |
 |---|---|---|---|
-| **A** | _(completar)_ | Datos, red y evaluación | `src/visionx/depth/learned/`, `src/visionx/depth/eval/`, `datasets/`, `experiments/` |
-| **B** | _(completar)_ | Cámara, aplicación y hardware | `src/visionx/camera/`, `calibration/`, `detection/`, `speech/`, `modes/`, `gui/`, `transport/` |
+| **A** | Bauty, `BautyGarcia` (macOS, Claude Code) | Datos, red y evaluación | `src/visionx/depth/learned/`, `src/visionx/depth/eval/`, `datasets/`, `experiments/` |
+| **B** | Tomás, `TomaasGonzalezzz` (Windows, Codex) | Cámara, aplicación y hardware | `src/visionx/camera/`, `calibration/`, `detection/`, `speech/`, `modes/`, `gui/`, `transport/` |
 | Ambos | | Compartido | `src/visionx/shared/`, `configs/default.yaml`, `pyproject.toml`, `AGENTS.md`, `.github/` |
 
 `src/visionx/depth/classical/` (SGBM, WLS, regla fija B4) es de A, y B lo usa desde la aplicación.
@@ -85,8 +85,10 @@ líneas si aparecen.
 - **Saltos de línea:** `.gitattributes` guarda todo con LF. No cambiarlo. Los hooks fallan con CRLF.
 - **Cámara:** el backend de OpenCV se elige en `configs/default.yaml` (`camera.backend`). En Windows
   suele hacer falta `dshow` o `msmf`. El índice de cámara de cada uno va en `configs/local.yaml`.
-- **PyTorch:** en la Mac usa MPS. En Windows, si hay GPU NVIDIA, hay que instalar la versión con
-  CUDA; si no, corre en CPU. `uv run visionx doctor` dice cuál está activa.
+- **PyTorch:** en la Mac usa MPS; en Windows corre en CPU. Nadie del equipo tiene GPU NVIDIA:
+  lo que exige CUDA (Fast-FoundationStereo, FoundationStereo, MonSter, DEFOM) se corre en una
+  máquina virtual con GPU, solo para entrenar y comparar. La demo en vivo corre en la Mac.
+  `uv run visionx doctor` dice qué acelerador está activo.
 - **Comandos en la documentación:** los que se escriben para el otro tienen que andar en PowerShell
   y en zsh. Para cosas del equipo se usa `uv run visionx ...`, que anda igual en los dos.
 - **Hooks en Windows:** Git for Windows los corre con su propio `sh`; no hace falta nada más,
