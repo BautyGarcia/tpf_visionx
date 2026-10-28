@@ -1,12 +1,10 @@
 # Instrucciones para Claude Code
 
-Las reglas del proyecto están en AGENTS.md. Seguirlas siempre.
-
 @AGENTS.md
 
-Recordatorios para Claude:
-- Al empezar una sesión, correr `uv run visionx novedades` y leer las entradas nuevas.
-- La otra persona usa Windows y Codex: todo lo que escribas tiene que funcionar en los dos.
-- Al terminar una tarea, crear la entrada del registro con `uv run visionx log "tema"` y completarla.
-- Documentación y mensajes de commit en español.
-- Nunca agregar `Co-Authored-By` ni "Generated with Claude Code" en commits, PRs ni documentos.
+- Fuente operativa: docs/coordinacion/PLAN.md. Bauty usa A.md; Tomás usa B.md.
+- Leer tarea e integración Ixx. Ejecutar uv run visionx novedades al empezar.
+- Una tarea por rama/worktree. No editar el checkout, área o tablero del otro.
+- Sin aprobación cruzada obligatoria: checks, merge propio y recepción del consumidor.
+- Registrar evidencia y límites. Documentación/commits en español.
+- No commitear/pushear sin pedido de la persona; sin firmas ni coautoría de herramientas.
