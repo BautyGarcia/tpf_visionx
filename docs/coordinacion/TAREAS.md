@@ -45,15 +45,15 @@ ID identifica tarea; etapa/dependencias definen orden. [Métricas M0-M12](METRIC
   Evidencia: ac66b96, PR #2 integrado; CI Windows/macOS/Linux aprobada y planificación publicada.
 
 ### C04 - Entornos y reglas remotas
-- [ ] C04 · estado: en curso · rama: b/C04-entorno-windows
+- [x] C04 · estado: hecha · rama: main
 - Ejecuta B; A aporta comprobación de su Mac. Instalar uv/Python3.11, base/ml según tarea,
   activar hooks, doctor y tests en ambas PCs. Registrar resultado y límites.
 - Verificar GitHub: PR con 0 aprobaciones, sin code-owner review, squash y checks de CI.
   Si solo Bauty administra, él aplica el ajuste; es configuración, no aprobación de contenido.
   Salida: evidencia de dos entornos y política remota; I00 no declara preparación sin prueba.
-- Avance: **Windows verificado** (uv/Python/hooks/doctor y 14 tests). Main sin protección;
-  rulesets no habilitados en el plan privado actual. Pendientes: Mac y decisión/aplicación de
-  protección. Evidencia y comandos: [C04.md](C04.md).
+- Cierre: **Windows y Mac física verificados**, 14 tests en ambos. Bauty registró Mac y
+  protección en 1e7adf6 (PR #4); ruleset activo comprobado por API: PR con 0 aprobaciones,
+  squash y tres checks requeridos. Evidencia y comandos: [C04.md](C04.md).
 
 ### C05 - Almacén compartido de artefactos
 - [ ] C05 · estado: pendiente · rama: —
