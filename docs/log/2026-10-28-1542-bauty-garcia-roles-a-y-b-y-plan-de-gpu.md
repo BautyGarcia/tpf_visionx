@@ -26,7 +26,8 @@ tarea: C02
 No aplica: solo documentación.
 
 ## Pendiente / próximo paso
-- Completar usuarios de GitHub en `.github/CODEOWNERS`.
+- Sumar a TomaasGonzalezzz como colaborador con permiso Write (si no, CODEOWNERS no lo reconoce).
+- Activar "Require review from Code Owners" en el ruleset de main.
 - Elegir proveedor de VM con GPU cuando haga falta (comparación con U1–U3 y entrenamiento si Kaggle/Colab no alcanza).
 
 ## Avisos para el otro

@@ -21,7 +21,7 @@ Para pedirle algo al otro, se agrega en la sección **Pedidos** del otro, con qu
 
 ---
 
-## B: cámara, aplicación y hardware (compañero)
+## B: cámara, aplicación y hardware (TomaasGonzalezzz)
 
 ### En curso / pendientes
 - [pendiente] B01 · Listar modos reales de la ELP (resolución, FPS, formato) · — ·
@@ -36,4 +36,4 @@ Para pedirle algo al otro, se agrega en la sección **Pedidos** del otro, con qu
 
 ## Compartidas
 - [hecha] C01 · Esqueleto del repo, entorno y protocolo de trabajo · main ·
-- [en revisión] C02 · Asignar roles A y B, y GPU: sin NVIDIA, CUDA en VM · a/C02-roles ·
+- [en revisión] C02 · Asignar roles A y B, CODEOWNERS, y GPU: sin NVIDIA, CUDA en VM · a/C02-roles ·

@@ -1,7 +1,30 @@
-# Quién revisa qué. Reemplazar <usuario-a> y <usuario-b> por los usuarios de GitHub
-# (sin los signos < >) y descomentar cuando el repo esté en GitHub.
-#
-# *                         <usuario-a> <usuario-b>
-# /src/visionx/shared/      <usuario-a> <usuario-b>
-# /src/visionx/depth/       <usuario-a>
-# /src/visionx/camera/      <usuario-b>
+# Quién revisa qué. GitHub pide automáticamente la revisión del dueño de cada archivo tocado.
+# Gana la última regla que coincide, por eso lo general va arriba y lo específico abajo.
+# A = BautyGarcia (datos, red, evaluación) · B = TomaasGonzalezzz (cámara, aplicación, hardware)
+
+# Por defecto: cualquiera de los dos
+*                               @BautyGarcia @TomaasGonzalezzz
+
+# Área A
+/src/visionx/depth/             @BautyGarcia
+/datasets/                      @BautyGarcia
+/experiments/                   @BautyGarcia
+
+# Área B
+/src/visionx/camera/            @TomaasGonzalezzz
+/src/visionx/calibration/       @TomaasGonzalezzz
+/src/visionx/detection/         @TomaasGonzalezzz
+/src/visionx/speech/            @TomaasGonzalezzz
+/src/visionx/modes/             @TomaasGonzalezzz
+/src/visionx/gui/               @TomaasGonzalezzz
+/src/visionx/transport/         @TomaasGonzalezzz
+
+# Compartido: los dos
+/src/visionx/shared/            @BautyGarcia @TomaasGonzalezzz
+/configs/default.yaml           @BautyGarcia @TomaasGonzalezzz
+/pyproject.toml                 @BautyGarcia @TomaasGonzalezzz
+/uv.lock                        @BautyGarcia @TomaasGonzalezzz
+/AGENTS.md                      @BautyGarcia @TomaasGonzalezzz
+/CLAUDE.md                      @BautyGarcia @TomaasGonzalezzz
+/.github/                       @BautyGarcia @TomaasGonzalezzz
+/.githooks/                     @BautyGarcia @TomaasGonzalezzz

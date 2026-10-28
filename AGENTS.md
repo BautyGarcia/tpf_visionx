@@ -11,8 +11,8 @@ es dueña de un área:
 
 | Rol | Persona | Área | Carpetas |
 |---|---|---|---|
-| **A** | Bauty (macOS, Claude Code) | Datos, red y evaluación | `src/visionx/depth/learned/`, `src/visionx/depth/eval/`, `datasets/`, `experiments/` |
-| **B** | Compañero (Windows, Codex) | Cámara, aplicación y hardware | `src/visionx/camera/`, `calibration/`, `detection/`, `speech/`, `modes/`, `gui/`, `transport/` |
+| **A** | Bauty, `BautyGarcia` (macOS, Claude Code) | Datos, red y evaluación | `src/visionx/depth/learned/`, `src/visionx/depth/eval/`, `datasets/`, `experiments/` |
+| **B** | Tomás, `TomaasGonzalezzz` (Windows, Codex) | Cámara, aplicación y hardware | `src/visionx/camera/`, `calibration/`, `detection/`, `speech/`, `modes/`, `gui/`, `transport/` |
 | Ambos | | Compartido | `src/visionx/shared/`, `configs/default.yaml`, `pyproject.toml`, `AGENTS.md`, `.github/` |
 
 `src/visionx/depth/classical/` (SGBM, WLS, regla fija B4) es de A, y B lo usa desde la aplicación.
