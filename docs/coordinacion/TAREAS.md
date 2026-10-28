@@ -39,18 +39,21 @@ ID identifica tarea; etapa/dependencias definen orden. [Métricas M0-M12](METRIC
   Política de aprobación anterior reemplazada por C03.
 
 ### C03 - Planificación e integración completas
-- [ ] C03 · estado: por integrar · rama: b/C03-planificacion-integracion
+- [x] C03 · estado: hecha · rama: main
 - Ejecuta B. Entrega A/B completas, I00-I08, contratos objetivo, métricas y flujo sin aprobación.
   Aceptación: IDs/dependencias/enlaces consistentes y cambios verificables; luego integrar a main.
-  Avisar a A la fuente vigente. Sin marcar hecha antes de publicación/incorporación de esta rama.
+  Evidencia: ac66b96, PR #2 integrado; CI Windows/macOS/Linux aprobada y planificación publicada.
 
 ### C04 - Entornos y reglas remotas
-- [ ] C04 · estado: pendiente · rama: —
+- [ ] C04 · estado: en curso · rama: b/C04-entorno-windows
 - Ejecuta B; A aporta comprobación de su Mac. Instalar uv/Python3.11, base/ml según tarea,
   activar hooks, doctor y tests en ambas PCs. Registrar resultado y límites.
 - Verificar GitHub: PR con 0 aprobaciones, sin code-owner review, squash y checks de CI.
   Si solo Bauty administra, él aplica el ajuste; es configuración, no aprobación de contenido.
   Salida: evidencia de dos entornos y política remota; I00 no declara preparación sin prueba.
+- Avance: **Windows verificado** (uv/Python/hooks/doctor y 14 tests). Main sin protección;
+  rulesets no habilitados en el plan privado actual. Pendientes: Mac y decisión/aplicación de
+  protección. Evidencia y comandos: [C04.md](C04.md).
 
 ### C05 - Almacén compartido de artefactos
 - [ ] C05 · estado: pendiente · rama: —
