@@ -47,8 +47,9 @@ si es viable. Mantener main ejecutable con fakes cuando faltan pesos o cámara.
 - Checks requeridos: core-ubuntu-latest, core-windows-latest, core-macos-latest cuando existan.
 - Squash permitido; bloquear force push/borrado de main. No usar revisión humana como gate técnico.
 - Administrador verifica Settings/Rulesets/Branches. CODEOWNERS/hooks locales no cambian eso.
-  Verificado el 28/10/2026: main **sin protección**; CI ejecutada pero no requerida. Rulesets
-  no habilitados en el plan privado actual. Evidencia y pendientes: [C04.md](C04.md).
+  Cierre verificado el 28/10/2026: ruleset `proteger-main` activo sobre main, PR con 0 aprobaciones,
+  squash, tres checks requeridos y rama actualizada. Force push/borrado bloqueados.
+  Evidencia: [C04.md](C04.md). La restricción inicial del repo privado quedó resuelta por Bauty.
 
 Agentes no commitean/pushean salvo pedido explícito para su tarea. Esa regla no obliga a pedir
 aprobación al compañero. No saltarse checks para integrar un cambio.
