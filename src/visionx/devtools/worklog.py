@@ -117,13 +117,24 @@ def recent(n: int = 5) -> list[dict[str, str]]:
 
 
 def tasks_in_progress() -> list[str]:
-    """Líneas de TAREAS.md que están en curso, en revisión o bloqueadas, y los pedidos."""
-    path = ROOT / "docs" / "coordinacion" / "TAREAS.md"
-    if not path.exists():
-        return []
-    keep = ("[en curso]", "[en revisión]", "[bloqueada]")
-    return [
-        ln.strip()
-        for ln in path.read_text(encoding="utf-8").splitlines()
-        if ln.strip().startswith("- ") and any(k in ln for k in keep)
-    ]
+    """Tareas activas de ambos responsables e hitos; admite el tablero anterior."""
+    folder = ROOT / "docs" / "coordinacion"
+    active = ("en curso", "por integrar", "bloqueada", "en revisión")
+    tasks = []
+    for name in ("TAREAS.md", "A.md", "B.md", "INTEGRACIONES.md"):
+        path = folder / name
+        if not path.exists():
+            continue
+        for line in path.read_text(encoding="utf-8").splitlines():
+            line = line.strip()
+            if not line.startswith("- [") or line.lower().startswith("- [x]"):
+                continue
+            state = re.search(r"estado:\s*([^·|]+)", line)
+            is_active = (
+                state.group(1).strip() in active
+                if state
+                else any(f"[{value}]" in line for value in active)
+            )
+            if is_active:
+                tasks.append(f"{name}: {line}")
+    return tasks

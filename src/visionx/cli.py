@@ -98,7 +98,7 @@ def main(argv: list[str] | None = None) -> int:
             fecha, autor, tarea = e.get("fecha", "?"), e.get("autor", "?"), e.get("tarea", "-")
             print(f"  {fecha}  {autor:<14} [{tarea}] {e['tema']}")
             print(f"      {e['archivo']}")
-        print("\nTareas en curso, en revisión o bloqueadas (docs/coordinacion/TAREAS.md):")
+        print("\nTareas en curso, por integrar o bloqueadas (docs/coordinacion/):")
         for t in tasks_in_progress() or ["  (ninguna)"]:
             print(f"  {t}")
         return 0

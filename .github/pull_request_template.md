@@ -1,22 +1,18 @@
-## Qué cambia
-<!-- una o dos frases -->
+## Tarea y resultado
+<!-- ID A/B/C, objetivo y comportamiento final. El autor integra sin aprobación ajena. -->
 
-## Tarea
-<!-- ID de docs/coordinacion/TAREAS.md, ej. B02 -->
+## Verificación
+<!-- Comandos ejecutados, resultados y métricas con n/unidad. Pendiente: motivo. -->
 
-## Área
-- [ ] A (datos, red, evaluación)
-- [ ] B (cámara, aplicación, hardware)
-- [ ] Compartido (`shared/`, configs, dependencias): **revisan los dos**
+## Entrega al otro
+<!-- Ixx, consumidor, config/artefacto + hash, comando y salida esperada.
+Si no hay entrega cruzada: no aplica. Cambio de contrato: versión y migración. -->
 
-## Checklist
-- [ ] `uv run ruff check .` y `uv run pytest` pasan
-- [ ] Entrada en `docs/log/` creada con `uv run visionx log`
-- [ ] `TAREAS.md` actualizado
-- [ ] Si cambió un contrato: subí `SCHEMA_VERSION` y lo explico abajo
-- [ ] Si agregué dependencias: están en `pyproject.toml` y `uv.lock`
-- [ ] No hay datos, pesos ni claves en el diff
+## Checklist técnico
+- [ ] Dependencias integradas; sin cambios ajenos, secretos ni artefactos pesados.
+- [ ] Checks pertinentes aprobados; mediciones pendientes explícitas.
+- [ ] Tarea y registro actualizados; cambios compartidos comunicados cuando afectan al otro.
+- [ ] Contrato, lock e instrucciones de recepción actualizados si corresponde.
 
-## Cómo probarlo
-
-## Avisos para el otro
+## Después del merge
+<!-- Commit integrado. El consumidor registra recepción en Ixx sin aprobar este PR. -->
