@@ -8,7 +8,7 @@ TPF de I308 Visión Artificial, UdeSA, Primavera 2026. El plan operativo vigente
 
 ## Entorno
 
-Requiere [uv](https://docs.astral.sh/uv/) y Python 3.11.
+Requiere [uv](https://docs.astral.sh/uv/) y Python 3.11.18 (fijado en `.python-version`).
 
 ```bash
 uv sync --locked            # dependencias base + herramientas de desarrollo
@@ -18,6 +18,9 @@ uv run pytest           # tests
 uv run ruff check .     # lint
 git config core.hooksPath .githooks   # una vez por clon: activa los hooks
 ```
+
+Preparación Windows/Mac: [C04](docs/coordinacion/C04.md). Cada clon activa sus hooks;
+la CI de GitHub no reemplaza la verificación del equipo físico.
 
 ## Estructura
 

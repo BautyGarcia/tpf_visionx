@@ -33,7 +33,7 @@ def doctor() -> int:
         _check("config", lambda: f"{len(load_config())} secciones"),
     ]
     _check("torch / MPS (opcional, extra 'ml')", _torch)
-    _check("hooks de git", _hooks)
+    results.append(_check("hooks de git", _hooks))
     return 0 if all(results) else 1
 
 
