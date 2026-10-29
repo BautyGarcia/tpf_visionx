@@ -34,7 +34,7 @@ No tildar mediciones físicas no ejecutadas. M0-M12 se definen en METRICAS.md.
 
 ## A04 - Interfaces y geometría compartidas
 
-- [ ] A04 · estado: pendiente · rama: —
+- [ ] A04 · estado: por integrar · rama: a/A04-contratos
 - **Etapa / depende:** E0 / C03.
 - **Hacer:** Implementar especificación de docs/CONTRATOS.md en shared/ con reserva de edición. Tipos/IDs/relojes, APIs públicas, errores y migración de schema; B aporta requisitos por comunicación directa.
 - **Entregar y medir:** Tests de dtype/shapes/positividad, mezcla de frames y resize/doffs. M0; rechazo de entradas adversas. No crear un contrato paralelo.

@@ -1,8 +1,29 @@
 # Contratos técnicos objetivo
 
-Especificación a implementar en **A04/B02/B04**, no API ya disponible. Hoy contracts.py tiene
-schema 1. A04 prepara cambio compartido, tests y migración; B aporta requisitos de replay.
-No crear una segunda familia de mensajes. Cambios semánticos se versionan.
+Especificación a implementar en **A04/B02/B04**. A04 prepara cambio compartido, tests y
+migración; B aporta requisitos de replay. No crear una segunda familia de mensajes. Cambios
+semánticos se versionan.
+
+## Estado de la implementación
+
+**A04 (schema 2)**: mensajes, interfaces, errores, relojes y geometría en `src/visionx/shared/`.
+
+| Archivo | Contenido |
+|---|---|
+| `contracts.py` | FrameKey, StereoFrame, DepthResult (+DepthStatus), Detection, SpatialObject, Command, AudioEvent; `check_schema`, `check_same_frame`, `check_geometry`, `check_not_expired` |
+| `interfaces.py` | Protocols FrameSource, DepthEstimator, Detector, SpatialEstimator, AudioSink |
+| `errors.py` | InvalidInput, SchemaMismatch, IdentityMismatch, Expired (ValueError); SourceError, EstimatorError (RuntimeError) |
+| `clock.py` | `now_ns`, Clock, MonotonicClock (vivo), ManualClock (replay y tests) |
+| `geometry.py` | StereoGeometry (fx, fy, cx, cy, B, doffs, `geometry_id`), `from_projections` (P1/P2 de OpenCV), d <-> Z, `pixel_to_angles`, `resized`, `cropped`; `resize_mask` y `resize_disparity` por vecino más cercano |
+
+- Los mensajes son inmutables y se validan al crearse; un esquema distinto da SchemaMismatch.
+  No había datos persistidos con schema 1, así que no hace falta migración.
+- Fallo de cámara o de modelo: excepción (SourceError/EstimatorError). Fin de grabación:
+  `read()` devuelve None. Cero objetos: Detection vacía. Profundidad no medible: DepthResult con
+  status y reason.
+- Geometría: Z = fx·B / (d + doffs), con doffs = cx_der - cx_izq. Al cambiar de tamaño se
+  alinean centros de píxel: x' = (x + 0.5)·s - 0.5; la disparidad escala con el ancho. Los mapas
+  y máscaras nunca se interpolan: vecino más cercano, para no inventar distancias en los bordes.
 
 ## Interfaces públicas
 
