@@ -81,6 +81,8 @@ logs/
 .claude/settings.local.json
 .claude/worktrees/
 CLAUDE.local.md
+# notas de traspaso Claude/Codex por worktree (ver AGENTS.md)
+TRASPASO.md
 
 # ---------- Referencias locales pesadas ----------
 # TP2 viejo (256 MB, con su propio .venv)

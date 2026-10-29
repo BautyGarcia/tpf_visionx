@@ -85,3 +85,17 @@ Indicar persona, ID, rama/worktree, rutas y recursos disponibles. Implementar el
 ejecutar verificación y devolver artefacto, métricas, límites y prueba para el consumidor.
 No solicitar aprobación del compañero por cada paso. Si falta hardware, usar el fake acordado
 y dejar la medición física pendiente.
+
+## Traspaso entre agentes
+
+La unidad es la tarea, no el agente: un worktree por tarea (`../visionx-wt/<ID>-tema`, rama
+`a/` o `b/` según FLUJO.md). Claude y Codex pueden alternarse en el mismo worktree sin aviso.
+- Al empezar: leer `TRASPASO.md` en la raíz del worktree (si existe), `git status`/`git diff`
+  y `uv run visionx novedades`.
+- Después de cada paso significativo, actualizar `TRASPASO.md` con:
+  tarea (Axx/Bxx/Ixx), objetivo, hecho, en curso, próximo paso concreto,
+  decisiones tomadas, lo que se probó y falló, y comandos de verificación.
+- Si la tarea produce o consume una integración Ixx, anotar qué falta del otro lado;
+  el estado oficial sigue en A.md/B.md.
+- Mantenerlo corto (máx. ~40 líneas); reemplazar, no acumular.
+- No commitear `TRASPASO.md`.
