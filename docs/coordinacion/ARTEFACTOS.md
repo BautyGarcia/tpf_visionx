@@ -1,9 +1,33 @@
 # Traspaso de software, grabaciones y resultados
 
-Código/configs/scripts por Git. Datasets, pares, calibraciones de sesión y pesos por un almacén
-compartido elegido en **C05**. Hasta elegirlo, no afirmar que la entrega pesada está disponible.
-Opciones: carpeta Drive compartida o almacenamiento equivalente accesible a ambos; no se instala
-una herramienta adicional por defecto. No compartir claves ni una ruta C:/Users/... como ubicación.
+Código/configs/scripts por Git. Datasets, pares, calibraciones de sesión y pesos por el almacén
+compartido elegido en **C05**. No compartir claves ni una ruta C:/Users/... como ubicación.
+
+## Almacén (C05)
+
+Carpeta Google Drive `VisionX-artefactos`, dueño Tomás, Bauty editor.
+Enlace: <https://drive.google.com/drive/folders/15dn-tT0PJ6tPDkqIhRCJdac5zugIf2Wp>. Hasta cerrar C05 (prueba de hash en ambas PCs), no afirmar que una
+entrega pesada está disponible.
+
+| Subcarpeta | Contenido |
+|---|---|
+| grabaciones/ | pares SBS, sesiones de replay, capturas ELP |
+| calibraciones/ | YAML, fotos de calibración/validación por sesión |
+| pesos/ | checkpoints y modelos exportados |
+| datasets/ | splits, GT y anotaciones |
+| demos/ | videos de demo y ensayos |
+| _prueba/ | archivo de prueba de descarga/hash de C05 |
+
+Subir:
+1. Una subcarpeta por `artifact_id` dentro del tipo: `calibraciones/B09-calib-01/`.
+   Inmutable: si cambia algo, nuevo ID; nunca sobrescribir ni borrar una versión publicada.
+2. Calcular SHA-256 de cada archivo y crear el manifiesto en `docs/artefactos/` (ver abajo);
+   `location` es `VisionX-artefactos/<tipo>/<artifact_id>/`, nunca una ruta local.
+3. Esperar a que Drive termine de sincronizar antes de comunicar la entrega.
+
+Acceso: Google Drive para escritorio (Windows y Mac). Cada PC fija su ruta local a la carpeta
+en `configs/local.yaml` (`artifacts.root`); las rutas compartidas son relativas a esa raíz.
+Cuidar la cuota de 15 GB: videos largos recortados o comprimidos, sin duplicar versiones.
 
 ## Manifiesto de entrega
 
