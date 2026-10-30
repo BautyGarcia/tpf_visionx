@@ -2,7 +2,8 @@
 
 **Son verificaciones técnicas, no aprobaciones de PR del compañero.** El productor hace merge
 de cambios compatibles cuando pasan checks. El consumidor actualiza main en su rama, obtiene
-artefacto/hash y ejecuta recepción. Marcar la tarea productora por integrar hasta esa recepción.
+artefacto/hash y ejecuta recepción. Conservar por integrar hasta recepción; si ya está en main, registrar commit integrado en A/B.
+La recepción pendiente no impide iniciar consumidores con API pública o fake.
 Registrar una línea por entrega; el coordinador del hito mantiene este archivo para evitar choque.
 
 Ficha de recepción mínima: `ID origen -> consumidor | commit | artifact_id/hash o fixture |
@@ -75,7 +76,7 @@ No ejecutar comandos de ejemplo no implementados: las tareas entregan su CLI/ins
 ## I05 - Cuatro modos USB estables
 
 - [ ] I05 · estado: pendiente · coordinador: B
-- **Requiere:** I04, A19, B03, B14-B19. B03 puede cerrar con fallback validado si AirPods falla.
+- **Requiere:** I02, A19 inicial, B03, B14-B19. I04 valida Fusion por separado. B03 puede cerrar con fallback validado si AirPods falla.
 - **A -> B:** política por objeto, umbrales de desarrollo y motivos de abstención.
 - **B -> A:** replay de buscar/guiar, distancia, leer y describir con eventos/mediciones.
 - **Recepción:** A ejecuta replay sin hardware; B prueba audio/voz en Mac y casos de fallo.
@@ -88,7 +89,7 @@ No ejecutar comandos de ejemplo no implementados: las tareas entregan su CLI/ins
 ## I06 - Resultados finales conjuntos
 
 - [ ] I06 · estado: pendiente · coordinador: A
-- **Requiere:** I05, A16/A17/A20-A22/A24, B20/B21, protocolo C07.
+- **Requiere:** I04/I05, A16/A17/A20-A22/A24.1–A24.4, B20/B21, protocolo C07.
 - **B -> A:** banco físico reservado, anotaciones y métricas de interacción/latencia.
 - **A -> B:** errores/intervalos/cobertura por método y figuras/scripts reproducibles.
 - **Recepción:** ambos regeneran un subconjunto de tablas desde mismos inputs/hashes. M4/M6-M10,
@@ -97,24 +98,24 @@ No ejecutar comandos de ejemplo no implementados: las tareas entregan su CLI/ins
 - **Cierre:** resultado positivo/negativo de hipótesis declarado; no ajustar contra test para ganar.
 - **Evidencia / recepción:** pendiente.
 
-## I07 - Extensiones o decisión de no hacerlas
+## I07 - Portátil, Lite, Fusion-FFS y alerta completos
 
 - [ ] I07 · estado: pendiente · coordinador: B
-- **Requiere:** I06; elegir por separado Lite, Fusion-FFS y wearable con presupuesto remanente.
-- **A -> B:** Lite/config/hash o decisión de mantener Fusion a pedido. **B -> A:** stream medido y
-  capturas de entrenamiento ELP fuera de test, si se necesitan pseudoetiquetas.
-- **Recepción:** A25-A28/B22-B25/B28 solo para extensiones elegidas. M11 y regresión I05; presets
-  experimentales separados. Streaming puede avanzar sin Lite; Lite puede existir sin wearable.
-  Si se elige alerta, B28 implementa la política de A28 y se prueba también por USB.
-- **Orden de merge:** contrato compatible; prototipos; modelos/hardware; benchmark USB/Wi-Fi.
-- **Cierre:** lista explícita hecho/no aplica con razón. Si se omite todo, marcar I07 no aplica;
-  no bloquear I08. No atribuir implementación a una extensión descartada.
+- **Inicio:** prototipos con replay tras I00; hardware Raspberry/batería tras USB funcional.
+- **Requiere para cierre:** I06, A25-A28, B22-B25/B28 y recursos verificados.
+- **Entrega A:** Lite y Fusion-FFS con pesos/hash, evaluación y política de alerta.
+- **Entrega B:** transporte, audio/control, montaje, energía y alerta medidos.
+- **Recepción:** M11 y regresión I05; USB/Wi-Fi, precisión/cobertura/latencia,
+  temperatura/consumo/autonomía y desconexiones. Streaming no espera Lite.
+- **Cierre:** capacidades implementadas y verificadas; un resultado negativo se reporta.
+  Lo incompleto continúa pendiente, no se descarta automáticamente por fecha.
+- **Relación con entrega:** I08 académico puede cerrar antes. VisionX completo exige I07.
 - **Evidencia / recepción:** pendiente.
 
 ## I08 - Release y defensa
 
 - [ ] I08 · estado: pendiente · coordinador: B
-- **Requiere:** I06, I07 resuelto (hecho/no aplica), A23/A29, B26/B27, C06/C08.
+- **Requiere:** I04/I05/I06, A23/A29, B26/B27, C06/C08.
 - **A -> B:** pesos/splits/tablas definitivos. **B -> A:** ejecutable/configs/operación y respaldo.
 - **Recepción:** A instala/demo B; B reproduce informe A. M12, 3 ensayos y 2/2 reproducciones;
   todas las cifras remiten a artefacto/config/commit. No depender de API en vivo para defensa.

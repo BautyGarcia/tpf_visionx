@@ -29,7 +29,8 @@ Los pedidos se hablan por WhatsApp/en persona; solo se registran dependencias/de
 3. Productor comunica: ID + commit integrado + artefacto/hash + comando + salida esperada + Ixx.
 4. Consumidor incorpora main a su rama, obtiene artefactos y ejecuta recepción.
 5. Registrar recepción Ixx. Si pasa, tarea hecha; si falla, corrección con input reproducible.
-   Mientras el consumidor no está listo, tarea por integrar y resto del sistema usa fake.
+   Mientras falta recepción, mantener por integrar y registrar `integrado: <commit>; recepción: pendiente`
+   en el índice A/B. Otros consumidores pueden usar esa API integrada o su fake. No declarar el hito cerrado.
 
 Ejemplo: A18 publica modelo; B13 lo carga y registra I04. B no tiene que aprobar el entrenamiento.
 Con B09/A07 se hace lo mismo para calibración. **No hacer merges cruzados A->B/B->A: pasar por main**.
@@ -53,3 +54,10 @@ si es viable. Mantener main ejecutable con fakes cuando faltan pesos o cámara.
 
 Agentes no commitean/pushean salvo pedido explícito para su tarea. Esa regla no obliga a pedir
 aprobación al compañero. No saltarse checks para integrar un cambio.
+
+## Ficha y comunicación mínima
+
+Estado solo en A/B; especificación en tareas/<ID>.md. Al tomarla completar rama/worktree,
+rutas y recursos reservados. Distinguir inicio con fixture de aceptación con consumidor.
+Entrega: ID + commit + manifiesto/hash + comando + esperado + Ixx. El agente actualiza
+TRASPASO y su ficha; coordinador actualiza índice por lote, sin aprobaciones cruzadas.

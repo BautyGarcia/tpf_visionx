@@ -16,7 +16,8 @@ semánticos se versionan.
 | `clock.py` | `now_ns`, Clock, MonotonicClock (vivo), ManualClock (replay y tests) |
 | `geometry.py` | StereoGeometry (fx, fy, cx, cy, B, doffs, `geometry_id`), `from_projections` (P1/P2 de OpenCV), d <-> Z, `pixel_to_angles`, `resized`, `cropped`; `resize_mask` y `resize_disparity` por vecino más cercano |
 
-- Los mensajes son inmutables y se validan al crearse; un esquema distinto da SchemaMismatch.
+- Los atributos de los mensajes son inmutables y se validan al crearse; los arrays no quedan
+  congelados por frozen=True (política de propiedad pendiente A04.5); un esquema distinto da SchemaMismatch.
   No había datos persistidos con schema 1, así que no hace falta migración.
 - Fallo de cámara o de modelo: excepción (SourceError/EstimatorError). Fin de grabación:
   `read()` devuelve None. Cero objetos: Detection vacía. Profundidad no medible: DepthResult con
@@ -73,3 +74,9 @@ de fichas son entregables futuros hasta que la tarea correspondiente se cierre.
 B->A: replay I00; pares y calibración I02; set ELP/GT I03; medidas finales I06.
 A->B: FakeDepth I00; SpatialObject I01; SGBM I02; B4 I03; Fusion I04; políticas I05;
 Lite I07 si corresponde. Cada entrega lleva manifiesto, config, versión y prueba de recepción.
+
+## Correcciones pendientes de auditoría
+
+Ver [auditoría](coordinacion/AUDITORIA.md). Frozen protege atributos, no arrays. La
+propiedad de buffers y geometría de detecciones requieren resolución antes de concurrencia.
+Disparidad efectiva y doffs requieren corrección coherente. No se cambia schema en C09.

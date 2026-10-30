@@ -11,7 +11,7 @@ Las decisiones se coordinan por WhatsApp/en persona; el repo registra versiones,
 | B | [B01-B28](B.md) | cámara, aplicación, hardware | entrega pares/app, recibe estimadores/políticas |
 | Coordinador del hito | [I00-I08](INTEGRACIONES.md) | solo su ficha Ixx | código + artefacto + recepción |
 
-Se tilda en cada ficha; no duplicar estado aquí. Agentes de implementación no editan tableros
+Estado de A/B solo en sus índices; fichas individuales sin estado duplicado. Agentes de implementación no editan tableros
 a la vez: el coordinador de cada persona registra cambios. [Flujo y estados](FLUJO.md).
 ID identifica tarea; etapa/dependencias definen orden. [Métricas M0-M12](METRICAS.md).
 
@@ -24,7 +24,7 @@ ID identifica tarea; etapa/dependencias definen orden. [Métricas M0-M12](METRIC
 - [E4 / I04](INTEGRACIONES.md#i04---fusion-dentro-de-la-aplicación): Fusion entrenada en aplicación.
 - [E5 / I05](INTEGRACIONES.md#i05---cuatro-modos-usb-estables): búsqueda, distancia, OCR y descripción.
 - [E6 / I06](INTEGRACIONES.md#i06---resultados-finales-conjuntos): evaluación final y tablas.
-- [E7 / I07](INTEGRACIONES.md#i07---extensiones-o-decisión-de-no-hacerlas): extensiones seleccionadas o no aplica.
+- [E7 / I07](INTEGRACIONES.md#i07---portátil-lite-fusion-ffs-y-alerta-completos): portátil, Lite, Fusion-FFS y alerta comprometidos; continuidad tras entrega.
 - [E8 / I08](INTEGRACIONES.md#i08---release-y-defensa): release, informe, póster y respaldo.
 
 ## Compartidas: un ejecutor, no dos aprobadores
@@ -69,7 +69,7 @@ ID identifica tarea; etapa/dependencias definen orden. [Métricas M0-M12](METRIC
 ### C06 - Alcance académico y disponibilidad
 - [ ] C06 · estado: pendiente · rama: —
 - Ejecuta A, coordina directo con B/cátedra. Registrar tema/equipo de 2 aprobado (consigna general
-  menciona 3/4), fecha real, horas disponibles y alcance de cuatro modos vs extensiones.
+  menciona 3/4), fecha de entrega 10/12/2026 confirmada por Tomás; faltan horas disponibles y aprobación académica.
   Confirmar informe <=8 páginas y póster A0/A1 vertical. Sin inventar autorización ni cronograma.
   Entrega: decisión fechada y ajuste de capacidad; antes de comprometer extensión/cierre.
 
@@ -87,10 +87,29 @@ ID identifica tarea; etapa/dependencias definen orden. [Métricas M0-M12](METRIC
 
 ## Arranque recomendado
 
-1. Integrar C03; preparar C04/C05 y confirmar C06.
-2. A empieza A04 y puede adelantar A01/A02; B hace B01/B03 mientras llega la API.
-3. Con A04 en main: A05 y B02/B04 en paralelo -> I00.
-4. A06 + B05/B06/B07 -> I01, sin esperar CNN ni calibración final.
+1. C03/C04 ya tienen evidencia; C05 espera lectura de hash en Mac. C06 fecha 10/12 confirmada, resto pendiente.
+2. A04 está en main con recepción pendiente: iniciar A05/B02/B04 y fixes auditados en tareas separadas.
+3. A01/A02, captura/calibración B01/B08/B09 y preparación A24.1–A24.4 avanzan en paralelo.
+4. A06 + B05/B06/B07 -> I01; OCR/voz/modos empiezan con fixtures sin esperar Fusion.
 
 Las tareas de software restantes están preparadas pero **pendientes**; un hito es recepción técnica,
 no un nuevo trámite de aprobación del compañero.
+
+## Coordinación de fichas — 29/10/2026
+
+Aplicar [PLAN v2](PLAN.md). Entrega USB 10/12/2026 y alcance posterior comprometido.
+A/B conservan el único estado oficial; fichas individuales contienen especificaciones sin
+estados duplicados. Coordinador actualiza índices; agentes editan su ficha y TRASPASO.
+Varios agentes por área, un worktree por tarea y reserva de archivos/hardware. Integrado
+significa código en main; recepción pendiente se registra separada en Ixx. Una tarea con
+recepción pendiente no bloquea inicio contra APIs/fakes; hecha exige aceptación completa.
+I07 posterior no bloquea I08 académico. Sin commits/push salvo pedido explícito.
+
+## C09 - Plan completo y coordinación v2
+
+- [ ] C09 · estado: por integrar · rama: b/C09-plan-completo
+- Responsable B por pedido del usuario; reserva documental de esta tarea. Sin hardware.
+- Entrega: fichas/índices, calendario, auditoría y decisión; validar enlaces/IDs/diff.
+- C06: fecha confirmada por Tomás 10/12/2026; aprobación académica y disponibilidad siguen pendientes.
+
+Lectura para el otro equipo/agente: [traspaso C09 a Bauty](LECTURA-BAUTY.md).
