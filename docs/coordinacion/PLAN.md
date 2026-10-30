@@ -1,64 +1,93 @@
-# Plan operativo VisionX
+# Plan operativo VisionX — versión 2
 
-Versión 1, 28/10/2026. A: Bauty; B: Tomás. Fija el orden de trabajo, no declara software
-implementado ni resultados obtenidos. Entrada común: [tablero](TAREAS.md).
+29/10/2026. Responsables A: Bauty; B: Tomás. Entrada: [tablero](TAREAS.md).
 
-## Objetivo y alcance
+Reemplaza la planificación v1; conserva IDs y evidencia. No declara software implementado. Entrega **10/12/2026**:
+cuatro modalidades funcionales por USB en PC/Mac, evaluación e informe/póster. Después se
+completa portátil, Lite, alerta y Fusion-FFS; no se descartan por ser dos personas. Memoria/SLAM
+siguen fuera. ELP disponible; Raspberry y batería se reciben tras USB funcional. Audio:
+AirPods y otros Bluetooth. Mac M2 Max/32 GB y créditos VM disponibles; verificar GPU/backend
+y presupuesto antes de gastar. A/B son responsables, no límite de agentes.
 
-Investigar si **Fusion**, U-Net residual propia de **10 canales**, mejora profundidad y/o utilidad
-de incertidumbre frente a métodos clásicos y B4. Integrarla en demo USB con buscar/guiar,
-distancia, lectura y descripción de escena. Demo en Mac; núcleo/replay también en Windows.
-CUDA/VM se usa para cómputo que lo requiera, no como dependencia de la interacción local.
+### Calendario objetivo (no evidencia)
 
-**Núcleo:** datos/geometría auditados; B0-B4; Fusion entrenada y evaluada; ablaciones;
-cuatro modos USB; dashboard/replay; informe, póster y reproducción cruzada.
-**Condicionado:** Fusion-FFS, Lite, Pi/Wi-Fi, wearable y alerta de cercanía.
-**Fuera de entrega:** SLAM, mapa persistente, memoria de objetos y guía de mano.
-Una red funcional no demuestra superioridad; también se reporta un resultado negativo.
+| Periodo | Salida verificable |
+|---|---|
+| 29/10–5/11 | Saneamiento contratos, replay/fakes, captura/calibración inicial, datos/comparadores preparados |
+| 6–12/11 | USB clásico, cuatro modos básicos, B0–B4 y protocolo congelado |
+| 13–19/11 | Overfit/piloto y entrenamiento Fusion, paquete intercambiable, comparadores ejecutables |
+| 20–26/11 | Integración Fusion, ablaciones, incertidumbre y regresiones |
+| 27/11–3/12 | Test reservado, reproducción cruzada, tablas, informe/póster y candidato |
+| 4–9/12 | Correcciones verificadas, tres ensayos, respaldo offline |
+| 10/12 | Entrega académica |
+| Posterior | Portátil, Lite, alerta y experimentos pendientes comprometidos |
 
-La propuesta visual v7 de `docs/` (Lite principal de 7 canales) es antecedente histórico.
-La propuesta vigente es `entregas/propuesta_visionx.html`/PDF más este plan. La revisión externa
-es consulta. Un cambio solicitado por la cátedra se registra en decisiones y actualiza tareas.
-No se mezclan ambas arquitecturas ni se afirma aprobación académica que no esté registrada.
+Retrasos se registran y replanifican sin ocultar pendientes ni inventar mediciones.
 
-## Etapas y puntos de merge
+### Ciencia
 
-| Etapa | Resultado integrado | Trabajo A | Trabajo B | Hito |
-|---|---|---|---|---|
-| E0 | Interfaces + replay y fakes portables | A01, A02, A04, A05 | B02, B04; adelantar B01/B03 si hay equipo | I00 |
-| E1 | Replay detecta y responde con profundidad simulada | A06 | B05-B07 | I01 |
-| E2 | Cámara/calibración + distancia clásica real | A03, A07 | B01, B08-B10 | I02 |
-| E3 | Baselines fuertes; datos/protocolo congelados | A08-A13 | B11-B12 | I03 |
-| E4 | Fusion entrenada e intercambiable con B4 | A14-A18 | B13 | I04 |
-| E5 | Cuatro modos USB; pérdida, cancelación y confianza | A19 | B03, B14-B19 | I05 |
-| E6 | Evaluación final y evidencia reproducible | A20-A22, A24 | B20-B21 | I06 |
-| E7 | Extensiones elegidas por mediciones | A25-A28 | B22-B25, B28 | I07 |
-| E8 | Release, informe, póster y defensa | A23, A29 | B26-B27 | I08 |
+**Depth Anything V2 Small preentrenada y congelada**, alineada a estéreo, aporta la entrada
+monocular de nuestra Fusion residual de diez canales junto con RGB y señales SGBM.
+B0–B4 son controles. Comparadores comprometidos: A24.1 MonSter, A24.2 DEFOM-Stereo,
+A24.3 FoundationStereo y A24.4 Fast-FoundationStereo. Los dos primeros comparan fusión
+mono/estéreo. Cada reproducción entrega repo/versión/pesos/licencia, backend, config,
+CSV precisión/cobertura/latencia en mismos frames y GT. Fallos requieren diagnóstico y
+alternativa de backend; cifras de papers no reemplazan ejecución propia.
+Fusion-FFS compara contra FFS solo. Lite compara con la misma red sin destilación.
+Antes de entrenar: splits/hash, normalización/cámara, huecos/NaN, métrica principal,
+checkpoint y presupuesto; overfit 8–16 recortes y piloto medidos. Precisión e incertidumbre
+son hipótesis separadas. Publicar regresiones si existen, no inventar dos casos negativos.
 
-Los IDs originales A01-A03/B01-B03 se conservan: **el orden lo dan etapa y dependencias, no
-el número**. No esperar todo A01 para replay ni terminar Fusion para audio. Cada PR compatible
-se integra cuando está listo; los Ixx comprueban el sistema completo.
+### Cuatro modalidades
 
-## Ejecución y capacidad
+| Modo | Base funcional | Mejoras de entrega y pulido |
+|---|---|---|
+| Buscar/guiar | Clase, presencia, bip, dirección, cancelar | Instancias, tracking, pérdida/reaparición, voz, atributos/identidad |
+| Distancia | Congelar par, máscara, metros o abstención | SGBM/B4/Fusion, política por objeto, rango/redondeo calibrados |
+| Leer | Frame, OCR y lectura cancelable | Nitidez, bloques, encuadre, números y CER |
+| Describir | Plantilla local y hechos medidos | VLM a pedido, hechos controlados, cancelar y fallback offline |
 
-- Fichas en [A.md](A.md)/[B.md](B.md). Tarea de una capacidad; si supera dos sesiones, dividir
-  en Axx.1/Bxx.1 sin renumerar. Cada persona actualiza su fichero, no todos sus agentes a la vez.
-- Entrada: dependencia integrada o fake indicado, fixture/config y rutas reservadas. Si falta,
-  marcar bloqueada y avanzar en lo independiente. Salida: evidencia y, si aplica, recepción.
-- Antes de etapa: acordar por WhatsApp/en persona objetivo, equipo disponible y presupuesto de
-  tiempo/cómputo. Registrar solo decisiones que alteren interfaces, alcance o experimentos.
-- C06 registra fecha real y horas disponibles. Propuesta inicial: I01 dentro del primer 20%
-  del tiempo, USB funcional antes del 60%; reservar al menos 20% para E6/E8. No son fechas
-  comprometidas. E7 no consume esa reserva; se decide no aplica si no aporta o no hay tiempo.
-- A13 mide un piloto antes de contratar/consumir GPU. Ninguna consigna promete horas o FPS sin
-  medir. Los umbrales de ingeniería son propuestos hasta congelarlos en C07 con datos de desarrollo.
+Números/unidades se componen desde mediciones estructuradas, no se confían al VLM.
+Portátil inicial: Raspberry captura/transporte/control/audio; computadora procesa.
 
-## Coordinadores y fuente de verdad
+### Dependencias v2
 
-B registra I00-I05/I07; A registra I06; B registra I08 con artefactos científicos de A.
-Registrar no significa aprobar el contenido ajeno. El productor es responsable de su módulo y
-el consumidor verifica que puede usarlo. Pasa todo por main; no copiar archivos entre ramas.
+Separar inicio (interfaz/fixture) de aceptación (consumidor real). A03 comienza sintético;
+A01/A02 completan evaluación. B11 comienza con fakes antes de I02. B12 separa captura de
+escenas de dashboard: captura no espera B4. A19 tiene política conservadora inicial y
+calibración Fusion posterior. B16 usa FakeDepth/SGBM antes de B13; B17 usa teclado antes
+de B15. B20 captura test reservado cuando geometría/protocolo estén fijados, sin esperar
+I05; no usar ese test para desarrollo. I05 valida modos con proveedor clásico; I04 valida
+Fusion aparte. I07 sigue alcance posterior comprometido y no bloquea I08 académico.
+Ver [auditoría](AUDITORIA.md) para correcciones antes de consumidores afectados.
 
-Documentos operativos: [flujo](FLUJO.md), [contratos](../CONTRATOS.md), [métricas](METRICAS.md),
-[artefactos](ARTEFACTOS.md), [integraciones](INTEGRACIONES.md). Tareas/decisiones deben apuntar
-a esta versión. Los documentos históricos no son instrucciones nuevas para las IAs.
+### Lectura de propuestas publicadas
+
+HTML/PDF de entregas se preservan como propuesta académica anterior; PLAN v2 prevalece
+para ejecución. Sus números nominales no son mediciones. B26 debe sincronizar HTML/PDF
+antes de nueva publicación: rango 0,5–3 m (no prometer 30 cm sin medir), GT independiente,
+cuatro comparadores y etapas Lite/portátil. No se regeneró PDF en C09.
+
+## Caminos paralelos e integraciones
+
+| Camino | Secuencia de aceptación |
+|---|---|
+| Base E0 | Contratos, fakes y replay → I00 |
+| Aplicación E1/E2/E5 | Replay y audio I01; USB/geometría I02; cuatro modos I05 |
+| Ciencia E3/E4/E6 | Datos/B4/protocolo I03; Fusion intercambiable I04; resultados I06 |
+| Entrega E8 | I04 + I05 + I06 y artefactos académicos → I08 |
+| Continuidad E7 | Lite, Fusion-FFS, portátil y alerta → I07 completo |
+
+Los números identifican capacidades, no una fila de espera global. OCR/voz/controlador
+avanzan con fakes, investigación con pares públicos y transporte con replay. Hardware se
+reserva aparte. El estado de I07 continúa pendiente después de I08 si falta funcionalidad.
+No se declara VisionX 100% por completar solo la entrega académica.
+
+## Comunicación y aceptación
+
+[A](A.md)/[B](B.md) contienen estados oficiales; [fichas](tareas/) especifican el trabajo.
+Cada capacidad entrega comando real, fixture/artefacto/hash y salida esperada. Un
+coordinador actualiza estados; cada agente modifica solo su ficha/rutas asignadas.
+Contratos en [CONTRATOS](../CONTRATOS.md), métricas en [METRICAS](METRICAS.md),
+artefactos en [ARTEFACTOS](ARTEFACTOS.md), recepción en [INTEGRACIONES](INTEGRACIONES.md).
+La reserva de cómputo incluye presupuesto; crédito disponible no autoriza gasto ilimitado.

@@ -2,8 +2,8 @@
 
 ## 1. Plan y responsables
 
-Leer [PLAN.md](docs/coordinacion/PLAN.md), la tarea de [A.md](docs/coordinacion/A.md) o
-[B.md](docs/coordinacion/B.md) y su [integración](docs/coordinacion/INTEGRACIONES.md).
+Leer [PLAN.md](docs/coordinacion/PLAN.md), el índice [A.md](docs/coordinacion/A.md) o
+[B.md](docs/coordinacion/B.md), la ficha en docs/coordinacion/tareas/ y su integración Ixx.
 El [tablero](docs/coordinacion/TAREAS.md) es la entrada común. Los PDF históricos son referencias.
 
 | Persona | Responsabilidad | Rutas propias |
@@ -39,8 +39,9 @@ registrarlo en la tarea. No se necesita aprobación de contenido del compañero.
   afecten al otro; no pedir aprobación de cada PR.
 - Consumidor actualiza su rama y ejecuta recepción I00-I08 después del merge. Es una prueba de
   compatibilidad, no una aprobación del contenido.
-- Checkbox [x] y estado hecha solo con aceptación y evidencia. Si otro consume y falta recepción:
-  estado por integrar. No tildar hitos sin prueba de ambos lados.
+- Checkbox [x] y estado hecha solo con aceptación y evidencia. Si el código ya está en main y falta recepción:
+  conservar estado por integrar y anotar `integrado: <commit>; recepción: pendiente` en su índice.
+  Esa API puede habilitar otras tareas; no confundir recepción pendiente con código sin integrar. No tildar hitos sin prueba de ambos lados.
 - Política remota objetivo: PR, **0 aprobaciones**, sin code-owner review y checks técnicos
   requeridos. C04 verifica esos ajustes; los archivos locales no cambian reglas de GitHub.
 
@@ -99,3 +100,10 @@ La unidad es la tarea, no el agente: un worktree por tarea (`../visionx-wt/<ID>-
   el estado oficial sigue en A.md/B.md.
 - Mantenerlo corto (máx. ~40 líneas); reemplazar, no acumular.
 - No commitear `TRASPASO.md`.
+
+## Ejecución paralela v2
+
+A/B son responsables de integración, no límites de ejecutores. Varios agentes por área con
+rutas separadas. Las fichas no duplican estados; el coordinador actualiza el índice A/B.
+No editar índices ajenos salvo tarea documental expresamente delegada, como C09.
+WhatsApp sirve para recursos/decisiones humanas; especificación/evidencia queda en Git.

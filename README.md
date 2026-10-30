@@ -43,7 +43,8 @@ Las carpetas por módulo (`camera/`, `calibration/`, `depth/`, `detection/`, `sp
 
 - Reglas y procedimiento: [`AGENTS.md`](AGENTS.md).
 - Tablero/arranque: [`TAREAS.md`](docs/coordinacion/TAREAS.md).
-- Consignas completas: [A01-A29, Bauty](docs/coordinacion/A.md) y [B01-B28, Tomás](docs/coordinacion/B.md).
+- Índices y estados: [A, Bauty](docs/coordinacion/A.md) y [B, Tomás](docs/coordinacion/B.md);
+  especificaciones en [fichas individuales](docs/coordinacion/tareas/).
 - **Cuándo combinar resultados:** [I00-I08](docs/coordinacion/INTEGRACIONES.md).
 - [Métricas](docs/coordinacion/METRICAS.md), [contratos objetivo](docs/CONTRATOS.md) y
   [entrega de artefactos](docs/coordinacion/ARTEFACTOS.md).
@@ -51,3 +52,9 @@ Las carpetas por módulo (`camera/`, `calibration/`, `depth/`, `detection/`, `sp
   **sin aprobación obligatoria del compañero**. Después se verifica recepción técnica.
 - Registro de trabajo: [`docs/log/`](docs/log/), un archivo por entrada (`uv run visionx log "tema"`).
 - Decisiones: [`docs/decisiones/`](docs/decisiones/).
+
+## Hitos acordados
+
+Entrega 10/12/2026: cuatro modos USB y evaluación científica. Continuidad: Raspberry/batería,
+Lite y alerta; sin SLAM/memoria. [Plan v2](docs/coordinacion/PLAN.md),
+[auditoría](docs/coordinacion/AUDITORIA.md) y [decisión](docs/decisiones/0002-entrega-usb-y-alcance-completo.md).

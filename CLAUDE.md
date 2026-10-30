@@ -8,3 +8,6 @@
 - Sin aprobación cruzada obligatoria: checks, merge propio y recepción del consumidor.
 - Registrar evidencia y límites. Documentación/commits en español.
 - No commitear/pushear sin pedido de la persona; sin firmas ni coautoría de herramientas.
+
+- PLAN v2: entrega USB 10/12/2026; portátil/Lite/alerta continúan comprometidos.
+- Leer ficha tareas/<ID>.md; A/B mantienen estado único. No esperar proveedor real si hay fixture.

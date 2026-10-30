@@ -46,3 +46,9 @@ El plano ChArUco derivado de la misma calibración no valida por sí solo escala
   Un test simulado no valida YOLO; un benchmark final no elige thresholds.
 - Metas no alcanzadas: decisión registrada (corregir, reducir alcance, aceptar límite). Geometría
   errónea, fuga de test y respuestas canceladas se corrigen; no se dispensan como rendimiento bajo.
+
+## Aclaración v2
+
+Conservar métricas y separar hipótesis de precisión e incertidumbre. Publicar regresiones
+si existen, sin exigir inventar dos casos negativos. Las 90 mediciones se agrupan por
+objeto/escena/sesión; no asumir independencia. GT de tablero no es GT denso del fondo.
