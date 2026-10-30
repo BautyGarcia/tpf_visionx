@@ -56,10 +56,15 @@ ID identifica tarea; etapa/dependencias definen orden. [Métricas M0-M12](METRIC
   squash y tres checks requeridos. Evidencia y comandos: [C04.md](C04.md).
 
 ### C05 - Almacén compartido de artefactos
-- [ ] C05 · estado: pendiente · rama: —
+- [ ] C05 · estado: en curso · rama: b/C05-almacen
 - Ejecuta B con acceso aportado por A. Elegir ubicación compartida, registrar acceso por config
   local y publicar fixture/archivo pequeño para prueba de descarga/hash en ambas PCs.
   Salida: [protocolo](ARTEFACTOS.md) aplicado con ubicación real; requerido antes de I02.
+- Avance: Drive `VisionX-artefactos` (dueño Tomás, Bauty editor), subcarpetas y reglas de
+  subida en ARTEFACTOS.md; clave `artifacts.root` en configs. Reserva de ARTEFACTOS.md,
+  TAREAS.md y default.yaml avisada a A. Prueba: `_prueba/C05-prueba.txt`, SHA-256
+  9037805d44459f3aca6d40f880c4625c5cb01d694cb47f36069d79f4494c537c (Windows, 2026-10-29).
+  Falta: mismo hash leído en la Mac de A.
 
 ### C06 - Alcance académico y disponibilidad
 - [ ] C06 · estado: pendiente · rama: —

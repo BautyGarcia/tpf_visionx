@@ -1,5 +1,8 @@
 # Configuración por defecto de VisionX. Los valores se cambian acá, no en el código.
 
+artifacts:
+  root: null                # carpeta local de VisionX-artefactos (Drive); cada uno la pisa en configs/local.yaml
+
 camera:
   device: 0                 # índice de la ELP en OpenCV (cada uno lo pisa en configs/local.yaml)
   backend: auto             # auto | avfoundation (macOS) | dshow | msmf (Windows) | v4l2 (Linux)
