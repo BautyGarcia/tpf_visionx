@@ -1,6 +1,7 @@
 # A04.1–A04.6: cambios y recepción de schema 3
 
-Implementación local delegada a Codex por Tomás; rama `a/A04-auditoria`, base `3034f40`.
+Implementación delegada a Codex por Tomás; integrada en PR #10, commit `d8a38bd`.
+Rama original `a/A04-auditoria`, base `3034f40`. Recepción I00 de Bauty pendiente.
 A conserva responsabilidad de shared; no se editó A.md ni se declaró recepción realizada.
 Reserva: shared/, tests de contratos/geometría y documentación asociada. Sin hardware.
 

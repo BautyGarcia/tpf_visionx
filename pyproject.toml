@@ -33,6 +33,10 @@ build-backend = "hatchling.build"
 [tool.hatch.build.targets.wheel]
 packages = ["src/visionx"]
 
+# Empaquetar el mismo default del checkout, sin mantener una segunda copia manual.
+[tool.hatch.build.targets.wheel.force-include]
+"configs/default.yaml" = "visionx/default.yaml"
+
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 addopts = "-q"

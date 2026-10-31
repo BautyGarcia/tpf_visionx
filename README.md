@@ -58,3 +58,10 @@ Las carpetas por módulo (`camera/`, `calibration/`, `depth/`, `detection/`, `sp
 Entrega 10/12/2026: cuatro modos USB y evaluación científica. Continuidad: Raspberry/batería,
 Lite y alerta; sin SLAM/memoria. [Plan v2](docs/coordinacion/PLAN.md),
 [auditoría](docs/coordinacion/AUDITORIA.md) y [decisión](docs/decisiones/0002-entrega-usb-y-alcance-completo.md).
+
+## Instalación distribuida (B27.1)
+
+El wheel incluye la configuración por defecto. Fuera del checkout ejecutar
+`visionx doctor --runtime-only`; para overrides explícitos usar `--config archivo.yaml`.
+`visionx log` es una herramienta del checkout, no del runtime distribuido.
+[Comandos y prueba aislada](docs/coordinacion/RECEPCION-B27.md).

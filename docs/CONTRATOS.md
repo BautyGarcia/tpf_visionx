@@ -81,8 +81,8 @@ Lite I07 como continuidad comprometida. Cada entrega lleva manifiesto, config, v
 
 ## Migración y recepción del schema 3
 
-A04.1–A04.6 se implementaron localmente en `a/A04-auditoria`; falta publicación autorizada
-y recepción I00 por Bauty. B27.1 se entrega en rama independiente `b/B27-instalacion`.
+A04.1–A04.6 se integraron mediante PR #10, commit `d8a38bd`; recepción I00 por Bauty
+pendiente. B27.1 se entrega en rama independiente `b/B27-instalacion` (PR #11).
 La guía ejecutable de recepción está en [RECEPCION-A04](coordinacion/RECEPCION-A04.md).
 
 - `Detection`: pasar `geometry_id` por nombre y propagar `calibration_id` desde el frame.
