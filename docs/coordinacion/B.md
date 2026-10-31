@@ -166,4 +166,5 @@ Estado oficial solo en este índice; especificaciones en fichas.
 - [ ] B12.2 · estado: pendiente · rama: —
 - [Especificación](tareas/B12.2.md).
 
-B27.1: implementación y verificación locales; integrado: pendiente; recepción Mac/I08: pendiente.
+B27.1: implementación verificada en commit `96f0f2b`; publicación en PR #11.
+La integración se consulta en ese PR; recepción Mac/I08 pendiente, no marcar hecha sin ella.
