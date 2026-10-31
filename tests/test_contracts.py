@@ -67,6 +67,7 @@ def detection(n=2, w=8, h=6, **kw):
         session_id=S,
         frame_id=1,
         model_id="fake",
+        geometry_id="g1080",
         image_size=(w, h),
         boxes=np.tile(np.array([[1, 1, 3, 3]], np.float32), (n, 1)),
         classes=tuple(["cup"] * n),
