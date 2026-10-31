@@ -34,8 +34,8 @@ def project(g: StereoGeometry, x: float, y: float, z: float) -> tuple[float, flo
         dict(fx=0.0),
         dict(fy=-1.0),
         dict(fx=float("nan")),
-        dict(cx=5000.0),  # centro fuera de la imagen
-        dict(cy=-10.0),
+        dict(cx=float("inf")),
+        dict(cy=float("nan")),
         dict(baseline_m=0.0),
         dict(baseline_m=-0.06),
         dict(doffs=float("inf")),
@@ -122,11 +122,15 @@ def test_invalid_disparities_never_become_distances():
         assert ELP.disparity_at(bad) is None
 
 
-def test_depth_far_beyond_doffs_is_unmeasurable():
-    # Con doffs grande, una Z enorme daría disparidad negativa: no se inventa.
-    z = np.full((MB.height, MB.width), 1e6, np.float32)
-    d, ok = MB.depth_to_disparity(z)
-    assert not ok.any() and np.isnan(d).all()
+def test_negative_disparity_with_doffs_is_physical():
+    g = StereoGeometry(4, 3, 100.0, 100.0, 1.5, 1.0, 0.06, doffs=10.0)
+    z = np.full((3, 4), 1.0, np.float32)
+    d, valid = g.depth_to_disparity(z)
+    assert valid.all()
+    np.testing.assert_array_equal(d, -4.0)
+    back, ok = g.disparity_to_depth(d, valid)
+    np.testing.assert_allclose(back, z)
+    assert ok.all() and g.disparity_at(1.0) == -4.0 and g.depth_at(-4.0) == 1.0
 
 
 @pytest.mark.parametrize(

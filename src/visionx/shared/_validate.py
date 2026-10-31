@@ -65,3 +65,13 @@ def finite_positive_inside(name: str, values: np.ndarray, mask: np.ndarray) -> N
     inside = values[mask]
     if inside.size and not (np.all(np.isfinite(inside)) and np.all(inside > 0)):
         raise InvalidInput(f"{name}: dentro de la máscara válida hay NaN, infinitos o valores <= 0")
+
+
+def snapshot(value: np.ndarray) -> np.ndarray:
+    """Copia estable y de solo lectura; el almacenamiento bytes no admite setflags(write=True)."""
+    # Solo setflags(write=False) no alcanza: el dueño del array original podría volver
+    # a escribir. Copiamos a bytes, que es inmutable, y reconstruimos una vista NumPy.
+    # La copia conserva dtype/shape y evita compartir memoria con buffers de captura.
+    storage = value.tobytes(order="C")
+    read_only_array = np.frombuffer(storage, dtype=value.dtype)
+    return read_only_array.reshape(value.shape)

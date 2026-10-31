@@ -6,19 +6,22 @@ semánticos se versionan.
 
 ## Estado de la implementación
 
-**A04 (schema 2)**: mensajes, interfaces, errores, relojes y geometría en `src/visionx/shared/`.
+**A04 (schema 3)**: mensajes, interfaces, errores, relojes y geometría en `src/visionx/shared/`.
 
 | Archivo | Contenido |
 |---|---|
-| `contracts.py` | FrameKey, StereoFrame, DepthResult (+DepthStatus), Detection, SpatialObject, Command, AudioEvent; `check_schema`, `check_same_frame`, `check_geometry`, `check_not_expired` |
+| `contracts.py` | FrameKey, StereoFrame, DepthResult (+DepthStatus), Detection, SpatialObject, Command, AudioEvent; `check_schema`, `check_same_frame`, `check_geometry`, `check_detection_frame`, `check_depth_geometry`, `check_not_expired` |
 | `interfaces.py` | Protocols FrameSource, DepthEstimator, Detector, SpatialEstimator, AudioSink |
 | `errors.py` | InvalidInput, SchemaMismatch, IdentityMismatch, Expired (ValueError); SourceError, EstimatorError (RuntimeError) |
 | `clock.py` | `now_ns`, Clock, MonotonicClock (vivo), ManualClock (replay y tests) |
 | `geometry.py` | StereoGeometry (fx, fy, cx, cy, B, doffs, `geometry_id`), `from_projections` (P1/P2 de OpenCV), d <-> Z, `pixel_to_angles`, `resized`, `cropped`; `resize_mask` y `resize_disparity` por vecino más cercano |
 
-- Los atributos de los mensajes son inmutables y se validan al crearse; los arrays no quedan
-  congelados por frozen=True (política de propiedad pendiente A04.5); un esquema distinto da SchemaMismatch.
-  No había datos persistidos con schema 1, así que no hace falta migración.
+- Los mensajes se validan al crearse y guardan copias de solo lectura de sus arrays: el emisor
+  conserva su buffer y el mensaje no cambia. Un esquema distinto da SchemaMismatch.
+- Migración de schema 2 a 3 (sin fixtures persistidas de schema 2 en Git): `Detection` exige `geometry_id` y admite
+  `calibration_id`; `DepthResult` admite `doffs` (default 0) y debe coincidir con su geometría.
+  Solo `d + doffs` debe ser positiva: d puede ser cero o negativa. Cambian los `geometry_id`, ahora
+  derivados del valor exacto de los floats. `cx`/`cy` pueden caer fuera de la imagen tras un recorte.
 - Fallo de cámara o de modelo: excepción (SourceError/EstimatorError). Fin de grabación:
   `read()` devuelve None. Cero objetos: Detection vacía. Profundidad no medible: DepthResult con
   status y reason.
@@ -50,7 +53,8 @@ de fichas son entregables futuros hasta que la tarea correspondiente se cierre.
 - Transformar en un solo lugar: máscaras vecino cercano; disparidad escala con el ancho;
   intrínsecos/doffs se ajustan al resize/recorte. No usar K cruda tras rectificar.
 - Disparidad float32 en px de cómputo; GT con escala/signo/doffs explícitos. Profundidad float32
-  en metros, máscara bool. NaN solo fuera de máscara válida; cero no significa distancia válida.
+  en metros, máscara bool. NaN solo fuera de máscara válida; Z=0 es inválida, pero d=0 puede
+  ser válida si doffs>0. El productor debe usar el doffs de su geometría, no inferirlo del mapa.
 - b Laplace positiva/finita en px de disparidad, distinta de consistencia L-R. Validar shapes
   de depth, máscaras e incertidumbre; máscaras de detección coinciden con cantidad de objetos.
 - SpatialObject informa Z axial de superficie visible típica. Inicial: mediana de disparidad
@@ -73,10 +77,30 @@ de fichas son entregables futuros hasta que la tarea correspondiente se cierre.
 
 B->A: replay I00; pares y calibración I02; set ELP/GT I03; medidas finales I06.
 A->B: FakeDepth I00; SpatialObject I01; SGBM I02; B4 I03; Fusion I04; políticas I05;
-Lite I07 si corresponde. Cada entrega lleva manifiesto, config, versión y prueba de recepción.
+Lite I07 como continuidad comprometida. Cada entrega lleva manifiesto, config, versión y prueba de recepción.
 
-## Correcciones pendientes de auditoría
+## Migración y recepción del schema 3
 
-Ver [auditoría](coordinacion/AUDITORIA.md). Frozen protege atributos, no arrays. La
-propiedad de buffers y geometría de detecciones requieren resolución antes de concurrencia.
-Disparidad efectiva y doffs requieren corrección coherente. No se cambia schema en C09.
+A04.1–A04.6 se implementaron localmente en `a/A04-auditoria`; falta publicación autorizada
+y recepción I00 por Bauty. B27.1 se entrega en rama independiente `b/B27-instalacion`.
+La guía ejecutable de recepción está en [RECEPCION-A04](coordinacion/RECEPCION-A04.md).
+
+- `Detection`: pasar `geometry_id` por nombre y propagar `calibration_id` desde el frame.
+- `DepthResult`: pasar `doffs=geometry.doffs`; verificar con `check_depth_geometry` al recibir.
+- Antes de aplicar máscaras, usar `check_detection_frame` sobre su imagen de referencia.
+- Si detector y depth tienen resoluciones diferentes, transformar la máscara explícitamente;
+  los validadores no hacen resize ni warp silencioso. La geometría del depth se valida aparte.
+- Regenerar geometry_id a partir de los parámetros: se eliminó el redondeo a 1e-6 que podía
+  asignar igual ID a valores diferentes. El hash no sustituye calibration_id ni es una métrica.
+- Datos schema 2 no se convierten cambiando solo el número: reconstruir desde parámetros e
+  imágenes originales, completar contexto y volver a validar. Fallar ante datos ambiguos.
+
+Los arrays se copian a almacenamiento de solo lectura al construir el mensaje. El emisor no
+debe modificarlos concurrentemente durante esa construcción; después puede reutilizar su
+buffer. El consumidor debe hacer una copia explícita si una librería necesita modificar datos.
+Esto tiene coste de memoria/copia: medir en B11/B21 antes de optimizar con buffers compartidos.
+No se promete rendimiento ni seguridad frente a código nativo que ignore flags de NumPy.
+
+`from_projections` soporta proyecciones canónicas rectificadas horizontales, origen en cámara
+izquierda y baseline positivo. Rechaza estéreo vertical, ojos invertidos y matrices no canónicas;
+no las interpreta como si cumplieran ese convenio. A07 debe validar la calibración física aparte.

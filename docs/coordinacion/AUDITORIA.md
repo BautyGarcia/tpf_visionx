@@ -48,3 +48,11 @@ Enlaces Markdown locales y anclas: sin errores. IDs/estados anteriores preservad
 70 tareas indexadas con ficha, sin estados duplicados en fichas; una plantilla adicional.
 Lector real de novedades compatible y git diff --check correcto. No se reejecutaron tests
 científicos o físicos para documentación ni se modificó src/tests/configs/dependencias.
+
+## Seguimiento técnico — 30/10/2026
+
+A04.1–A04.6 tienen implementación y regresiones locales en `a/A04-auditoria` (base 3034f40).
+No se cambió el estado oficial en A.md: falta integración y recepción I00.
+[Guía de migración](RECEPCION-A04.md) y [mejoras preventivas](MEJORAS-PREVENTIVAS.md).
+B27.1 se implementó y verificó aparte en `b/B27-instalacion`; recepción Mac/I08 pendiente.
+Los resultados físicos/ML de esta auditoría siguen sin ejecutarse.

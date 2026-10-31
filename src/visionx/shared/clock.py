@@ -10,6 +10,8 @@ from __future__ import annotations
 import time
 from typing import Protocol, runtime_checkable
 
+from visionx.shared import _validate as v
+
 
 def now_ns() -> int:
     """Reloj monotónico local, en nanosegundos."""
@@ -32,15 +34,16 @@ class ManualClock:
     """Reloj que solo avanza cuando se lo pide. Para replay y tests."""
 
     def __init__(self, start_ns: int = 0) -> None:
-        self._t = int(start_ns)
+        self._t = v.non_negative_int("start_ns", start_ns)
 
     def now_ns(self) -> int:
         return self._t
 
     def set(self, t_ns: int) -> None:
+        t_ns = v.non_negative_int("t_ns", t_ns)
         if t_ns < self._t:
             raise ValueError("un reloj monotónico no retrocede")
         self._t = int(t_ns)
 
     def advance(self, dt_ns: int) -> None:
-        self.set(self._t + int(dt_ns))
+        self.set(self._t + v.non_negative_int("dt_ns", dt_ns))
