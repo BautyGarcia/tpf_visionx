@@ -153,7 +153,7 @@ Estado oficial solo en este índice; especificaciones en fichas.
 
 ## B27.1 - Corrección auditada
 
-- [ ] B27.1 · estado: pendiente · rama: —
+- [ ] B27.1 · estado: por integrar · rama: b/B27-instalacion
 - [Especificación](tareas/B27.1.md).
 
 ## B12.1 - Banco ELP
@@ -165,3 +165,5 @@ Estado oficial solo en este índice; especificaciones en fichas.
 
 - [ ] B12.2 · estado: pendiente · rama: —
 - [Especificación](tareas/B12.2.md).
+
+B27.1: implementación y verificación locales; integrado: pendiente; recepción Mac/I08: pendiente.

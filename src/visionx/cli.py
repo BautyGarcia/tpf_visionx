@@ -17,7 +17,12 @@ def _check(name: str, fn) -> bool:
         return False
 
 
-def doctor() -> int:
+def doctor(config_path: str | None = None, *, runtime_only: bool = False) -> int:
+    """Revisa el entorno base y el override elegido, sin abrir cámara ni descargar modelos.
+
+    El modo habitual también verifica hooks para quienes desarrollan. Una instalación
+    distribuida usa runtime_only, porque no necesita Git ni sus hooks para funcionar.
+    """
     import cv2
     import numpy as np
 
@@ -28,21 +33,27 @@ def doctor() -> int:
     results = [
         _check("numpy", lambda: np.__version__),
         _check("opencv", lambda: cv2.__version__),
-        _check("ChArUco (aruco)", _charuco),
+        _check("ChArUco (aruco)", lambda: _charuco(config_path)),
         _check("filtro WLS (ximgproc)", _wls),
-        _check("config", lambda: f"{len(load_config())} secciones"),
+        _check(
+            "config",
+            lambda: (
+                f"{len(load_config(config_path))} secciones; override={config_path or 'ninguno'}"
+            ),
+        ),
     ]
     _check("torch / MPS (opcional, extra 'ml')", _torch)
-    results.append(_check("hooks de git", _hooks))
+    if not runtime_only:
+        results.append(_check("hooks de git", _hooks))
     return 0 if all(results) else 1
 
 
-def _charuco() -> str:
+def _charuco(config_path: str | None = None) -> str:
     import cv2
 
     from visionx.shared.config import load_config
 
-    c = load_config()["calibration"]
+    c = load_config(config_path)["calibration"]
     dic = cv2.aruco.getPredefinedDictionary(getattr(cv2.aruco, c["dictionary"]))
     board = cv2.aruco.CharucoBoard(tuple(c["squares"]), c["square_m"], c["marker_m"], dic)
     cv2.aruco.CharucoDetector(board)
@@ -80,7 +91,11 @@ def _torch() -> str:
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(prog="visionx")
     sub = parser.add_subparsers(dest="cmd", required=True)
-    sub.add_parser("doctor", help="revisa dependencias y configuración")
+    diag = sub.add_parser("doctor", help="revisa dependencias y configuración")
+    diag.add_argument("--config", help="override YAML explícito; local.yaml no se carga solo")
+    diag.add_argument(
+        "--runtime-only", action="store_true", help="omite hooks Git para distribución"
+    )
     log = sub.add_parser("log", help="crea una entrada del registro en docs/log/")
     log.add_argument("tema", help="tema corto de la entrada")
     log.add_argument("--agente", default="", help="ej. claude-code, codex")
@@ -89,7 +104,7 @@ def main(argv: list[str] | None = None) -> int:
     nov.add_argument("-n", type=int, default=5, help="cantidad de entradas")
     args = parser.parse_args(argv)
     if args.cmd == "doctor":
-        return doctor()
+        return doctor(args.config, runtime_only=args.runtime_only)
     if args.cmd == "novedades":
         from visionx.devtools.worklog import recent, tasks_in_progress
 
@@ -105,7 +120,11 @@ def main(argv: list[str] | None = None) -> int:
     if args.cmd == "log":
         from visionx.devtools.worklog import new_entry
 
-        path = new_entry(args.tema, agente=args.agente, tarea=args.tarea)
+        try:
+            path = new_entry(args.tema, agente=args.agente, tarea=args.tarea)
+        except RuntimeError as exc:
+            print(f"error: {exc}", file=sys.stderr)
+            return 1
         print(f"Entrada creada: {path.relative_to(path.parents[2])}")
         return 0
     return 1

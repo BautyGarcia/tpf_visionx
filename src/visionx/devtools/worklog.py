@@ -53,7 +53,9 @@ def _git(*args: str) -> str:
             errors="replace",
             check=True,
         ).stdout
-        return out.strip()
+        # git status --porcelain usa dos columnas iniciales (por ejemplo " M ").
+        # strip() quitaría la primera y changed_files recortaría parte del nombre.
+        return out.rstrip("\r\n")
     except (subprocess.CalledProcessError, FileNotFoundError):
         return ""
 
@@ -75,6 +77,12 @@ def changed_files() -> list[str]:
 
 
 def new_entry(tema: str, agente: str = "", tarea: str = "", now: datetime | None = None) -> Path:
+    # El registro es una herramienta del repositorio, no un output de la aplicación.
+    # Evitar que un wheel instalado intente escribir docs/log dentro del entorno Python.
+    if not (ROOT / "pyproject.toml").is_file() or not (ROOT / "src" / "visionx").is_dir():
+        raise RuntimeError(
+            "visionx log requiere un checkout del proyecto, no una instalación wheel"
+        )
     now = now or datetime.now()
     autor = _git("config", "user.name") or "sin-nombre"
     rama = _git("branch", "--show-current") or "sin-rama"
