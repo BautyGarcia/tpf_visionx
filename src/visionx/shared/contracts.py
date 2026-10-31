@@ -9,14 +9,18 @@ Convenciones:
 - Imágenes BGR uint8 H x W x 3 (el orden de OpenCV). La conversión a RGB la hace quien prepara
   la red, no el contrato.
 - Disparidad float32 en píxeles de la resolución de cómputo; profundidad float32 en metros;
-  máscaras bool. Dentro de la máscara válida todo es finito y > 0; afuera puede haber NaN.
+  máscaras bool. Z y d+doffs positivas dentro de máscara; afuera puede haber NaN.
 - Tiempos en nanosegundos de un reloj monotónico (ver clock.py).
 """
 
 from __future__ import annotations
 
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from enum import IntEnum, StrEnum
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from visionx.shared.geometry import StereoGeometry
 
 import numpy as np
 
@@ -24,7 +28,9 @@ from visionx.shared import _validate as v
 from visionx.shared.clock import now_ns
 from visionx.shared.errors import Expired, IdentityMismatch, InvalidInput, SchemaMismatch
 
-SCHEMA_VERSION = 2
+# Schema 3 añade referencia geométrica a Detection y admite d <= 0 si d+doffs > 0.
+# Los mensajes de schema 2 deben reconstruirse explícitamente; ver docs/CONTRATOS.md.
+SCHEMA_VERSION = 3
 
 __all__ = [
     "SCHEMA_VERSION",
@@ -42,6 +48,8 @@ __all__ = [
     "StereoFrame",
     "UncertaintyKind",
     "check_geometry",
+    "check_detection_frame",
+    "check_depth_geometry",
     "check_not_expired",
     "check_same_frame",
     "check_schema",
@@ -51,7 +59,7 @@ __all__ = [
 
 def _check_schema_field(obj: object) -> None:
     schema = getattr(obj, "schema", None)
-    if schema != SCHEMA_VERSION:
+    if type(schema) is not int or schema != SCHEMA_VERSION:
         raise SchemaMismatch(
             f"{type(obj).__name__}: esquema {schema}, este código usa {SCHEMA_VERSION}"
         )
@@ -109,6 +117,13 @@ class StereoFrame:
         if self.left.shape[0] == 0 or self.left.shape[1] == 0:
             raise InvalidInput("imagen vacía")
         v.non_negative_int("received_ns", self.received_ns)
+        if not isinstance(self.capture_clock, CaptureClock):
+            raise InvalidInput("capture_clock inválido")
+        if type(self.rectified) is not bool:
+            raise InvalidInput("rectified debe ser bool")
+        for name in ("calibration_id", "geometry_id"):
+            if getattr(self, name) is not None:
+                v.text(name, getattr(self, name))
         if (self.capture_ns is None) != (self.capture_clock is CaptureClock.NONE):
             raise InvalidInput("capture_ns y capture_clock tienen que venir juntos")
         if self.capture_ns is not None:
@@ -118,6 +133,11 @@ class StereoFrame:
         if self.rectified and (self.calibration_id is None or self.geometry_id is None):
             raise InvalidInput("un par rectificado necesita calibration_id y geometry_id")
         v.text("source_id", self.source_id)
+        # Cada mensaje conserva su propio contenido aunque la cámara reutilice su buffer.
+        # object.__setattr__ solo se usa al construir una dataclass frozen.
+        for name in ("left", "right"):
+            image = getattr(self, name)
+            object.__setattr__(self, name, v.snapshot(image))
 
     @property
     def key(self) -> FrameKey:
@@ -166,6 +186,8 @@ class DepthResult:
     uncertainty: np.ndarray | None = None  # H x W float32
     uncertainty_kind: UncertaintyKind = UncertaintyKind.NONE
     alignment_quality: float | None = None
+    # Offset entre centros ópticos; debe salir de la geometría usada por el estimador.
+    doffs: float = field(default=0.0, kw_only=True)
     schema: int = SCHEMA_VERSION
 
     def __post_init__(self) -> None:
@@ -175,7 +197,14 @@ class DepthResult:
         v.text("geometry_id", self.geometry_id)
         d = v.array("disparity_px", self.disparity_px, np.float32, 2)
         mask = v.array("valid_mask", self.valid_mask, np.bool_, 2, d.shape)
-        v.finite_positive_inside("disparity_px", d, mask)
+        v.finite("doffs", self.doffs)
+        # La magnitud física es d+doffs. Rechazar d negativa descartaría puntos válidos
+        # de cámaras cuyos centros ópticos rectificados no están alineados.
+        effective = d[mask].astype(np.float64) + self.doffs
+        if not np.isfinite(effective).all() or np.any(effective <= 0):
+            raise InvalidInput("disparidad efectiva d+doffs debe ser finita y positiva")
+        if 0 in d.shape:
+            raise InvalidInput("mapa de profundidad vacío")
         v.finite("inference_ms", self.inference_ms, low=0.0)
 
         if not isinstance(self.status, DepthStatus):
@@ -192,6 +221,8 @@ class DepthResult:
             z = v.array("depth_m", self.depth_m, np.float32, 2, d.shape)
             v.finite_positive_inside("depth_m", z, mask)
 
+        if not isinstance(self.uncertainty_kind, UncertaintyKind):
+            raise InvalidInput("uncertainty_kind inválido")
         if (self.uncertainty is None) != (self.uncertainty_kind is UncertaintyKind.NONE):
             raise InvalidInput("uncertainty y uncertainty_kind tienen que venir juntos")
         if self.uncertainty is not None:
@@ -206,6 +237,9 @@ class DepthResult:
 
         if self.alignment_quality is not None:
             v.finite("alignment_quality", self.alignment_quality)
+        for name in ("disparity_px", "valid_mask", "depth_m", "uncertainty"):
+            if getattr(self, name) is not None:
+                object.__setattr__(self, name, v.snapshot(getattr(self, name)))
 
     @property
     def key(self) -> FrameKey:
@@ -229,6 +263,10 @@ class Detection:
     session_id: str
     frame_id: int
     model_id: str
+    # Mismo tamaño no significa misma imagen: identificar rectificación/recorte y sesión
+    # de calibración permite rechazar una máscara aplicada sobre coordenadas ajenas.
+    geometry_id: str = field(kw_only=True)
+    calibration_id: str | None = field(default=None, kw_only=True)
     image_size: tuple[int, int]  # (ancho, alto) de la imagen de referencia
     boxes: np.ndarray  # N x 4 float32, xyxy en píxeles
     classes: tuple[str, ...]
@@ -242,6 +280,9 @@ class Detection:
         _check_schema_field(self)
         FrameKey(self.session_id, self.frame_id)
         v.text("model_id", self.model_id)
+        v.text("geometry_id", self.geometry_id)
+        if self.calibration_id is not None:
+            v.text("calibration_id", self.calibration_id)
         if (
             not isinstance(self.image_size, tuple)
             or len(self.image_size) != 2
@@ -271,6 +312,9 @@ class Detection:
         if self.masks is not None:
             w, h = self.image_size
             v.array("masks", self.masks, np.bool_, 3, (n, h, w))
+        for name in ("boxes", "scores", "masks"):
+            if getattr(self, name) is not None:
+                object.__setattr__(self, name, v.snapshot(getattr(self, name)))
 
     @property
     def key(self) -> FrameKey:
@@ -411,6 +455,8 @@ class AudioEvent:
             raise InvalidInput(f"priority inválida: {self.priority!r}")
         v.text("text_or_sound", self.text_or_sound)
         v.non_negative_int("created_ns", self.created_ns)
+        if type(self.cancelable) is not bool:
+            raise InvalidInput("cancelable debe ser bool")
         _check_deadline(self.created_ns, self.deadline_ns)
         if self.frame is not None and not isinstance(self.frame, FrameKey):
             raise InvalidInput("frame tiene que ser un FrameKey")
@@ -438,6 +484,9 @@ def check_same_frame(*msgs: object) -> FrameKey:
     """
     if not msgs:
         raise ValueError("check_same_frame necesita al menos un mensaje")
+    for msg in msgs:
+        if not isinstance(msg, FrameKey):
+            check_schema(msg)
     keys = [m if isinstance(m, FrameKey) else m.key for m in msgs]  # type: ignore[attr-defined]
     if any(k != keys[0] for k in keys[1:]):
         raise IdentityMismatch(f"frames distintos: {[(k.session_id, k.frame_id) for k in keys]}")
@@ -446,6 +495,8 @@ def check_same_frame(*msgs: object) -> FrameKey:
 
 def check_geometry(msg: object, geometry_id: str) -> None:
     """Verifica que msg esté expresado en la geometría esperada."""
+    check_schema(msg)
+    v.text("geometry_id esperado", geometry_id)
     got = getattr(msg, "geometry_id", None)
     if got != geometry_id:
         raise IdentityMismatch(f"geometría {got!r}, se esperaba {geometry_id!r}")
@@ -453,7 +504,43 @@ def check_geometry(msg: object, geometry_id: str) -> None:
 
 def check_not_expired(msg: Command | AudioEvent, now: int) -> None:
     """Lanza Expired si msg tiene deadline y now ya lo pasó. now viene del Clock en uso."""
+    check_schema(msg)
+    v.non_negative_int("now", now)
     if msg.deadline_ns is not None and now > msg.deadline_ns:
         raise Expired(
             f"request {msg.request_id} vencido hace {(now - msg.deadline_ns) / 1e6:.1f} ms"
         )
+
+
+def check_detection_frame(frame: StereoFrame, detections: Detection) -> None:
+    """Valida detecciones ya expresadas en la imagen de referencia.
+
+    Llamar antes de usar cajas/máscaras sobre ese frame. No hace resize ni rectifica:
+    transformar datos exige un paso explícito que actualice geometry_id e image_size.
+    """
+    check_same_frame(frame, detections)
+    if frame.geometry_id is None:
+        raise IdentityMismatch("el frame necesita referencia geométrica para combinar detecciones")
+    check_geometry(detections, frame.geometry_id)
+    if detections.calibration_id != frame.calibration_id:
+        raise IdentityMismatch("detecciones y frame tienen calibraciones distintas")
+    if detections.image_size != frame.size:
+        raise IdentityMismatch("detecciones y frame tienen tamaños distintos")
+
+
+def check_depth_geometry(depth: DepthResult, geometry: StereoGeometry) -> None:
+    """Comprueba contexto de cómputo; no asume misma resolución que el detector.
+
+    Llamar al recibir profundidad, antes de convertirla a metros o agregar por objeto.
+    Si el productor entrega también depth_m, verificar que no contradiga su disparidad.
+    """
+    check_schema(depth)
+    check_geometry(depth, geometry.geometry_id)
+    if depth.size != geometry.size or depth.doffs != geometry.doffs:
+        raise IdentityMismatch("depth y geometría discrepan en tamaño o doffs")
+    if depth.depth_m is not None:
+        expected, valid = geometry.disparity_to_depth(depth.disparity_px, depth.valid_mask)
+        if not np.array_equal(valid, depth.valid_mask) or not np.allclose(
+            depth.depth_m[valid], expected[valid], rtol=1e-5, atol=1e-6
+        ):
+            raise IdentityMismatch("depth_m no corresponde a disparity_px y su geometría")

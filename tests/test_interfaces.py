@@ -70,6 +70,7 @@ class NoneDetector:
             (),
             np.zeros(0, np.float32),
             0.0,
+            geometry_id="g",
         )
 
     def close(self) -> None:

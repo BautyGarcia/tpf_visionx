@@ -1,0 +1,16 @@
+# Cámara virtual: a Z=1 m corresponde d=-4 px, aunque d+doffs=6 px.
+schema: 3
+geometry:
+  width: 4
+  height: 3
+  fx: 100.0
+  fy: 90.0
+  cx: 1.5
+  cy: 1.0
+  baseline_m: 0.06
+  doffs: 10.0
+session_id: schema3-fixture
+frame_id: 0
+calibration_id: virtual-schema3
+expected_disparity_px: -4.0
+expected_depth_m: 1.0
