@@ -1,18 +1,20 @@
 ## Tarea y resultado
-<!-- ID A/B/C, objetivo y comportamiento final. El autor integra sin aprobación ajena. -->
 
-## Verificación
-<!-- Comandos ejecutados, resultados y métricas con n/unidad. Pendiente: motivo. -->
+<!-- T01–T20; problema, cambio y motivo. Documentación o implementación: indicarlo. -->
 
-## Entrega al otro
-<!-- Ixx, consumidor, config/artefacto + hash, comando y salida esperada.
-Si no hay entrega cruzada: no aplica. Cambio de contrato: versión y migración. -->
+## Evidencia y límites
 
-## Checklist técnico
-- [ ] Dependencias integradas; sin cambios ajenos, secretos ni artefactos pesados.
-- [ ] Checks pertinentes aprobados; mediciones pendientes explícitas.
-- [ ] Tarea y registro actualizados; cambios compartidos comunicados cuando afectan al otro.
-- [ ] Contrato, lock e instrucciones de recepción actualizados si corresponde.
+<!-- Comprobaciones realmente ejecutadas y resultado. Si no hubo tests, decirlo.
+No confundir CI con medición física. Para documentación: enlaces, coherencia y diff. -->
 
-## Después del merge
-<!-- Commit integrado. El consumidor registra recepción en Ixx sin aprobar este PR. -->
+## Entrega y pendientes
+
+<!-- Consumidor, commit/artefacto/hash y recepción necesaria. Si cambia contrato: migración.
+Registrar bloqueos y próximo paso en BITACORA, aunque el resultado sea negativo. -->
+
+## Checklist
+
+- [ ] Alcance solicitado respetado; sin cambios ajenos, secretos ni datos pesados.
+- [ ] ROADMAP actualizado si cambió estado/decisión; BITACORA actualizada.
+- [ ] Verificación pertinente y límites informados; ningún resultado supuesto.
+- [ ] Entradas/salidas e instrucciones actualizadas si corresponde.
