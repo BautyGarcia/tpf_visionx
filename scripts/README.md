@@ -1,5 +1,8 @@
-Scripts de una sola vez: descargar datasets, generar manifests, preprocesar. Se corren con
-`uv run python scripts/<nombre>.py`.
+# Utilidades
 
-`verify_wheel.py --python <intérprete>` verifica un wheel ya instalado desde un cwd externo.
-Ver [recepción B27.1](../docs/coordinacion/RECEPCION-B27.md). No abre hardware.
+Los scripts complementan las tareas del [ROADMAP](../docs/ROADMAP.md).
+Ejecutarlos solo al implementar o verificar el trabajo solicitado.
+
+`verify_wheel.py --python <intérprete>` comprueba una instalación distribuida desde un
+directorio externo. Procedimiento y límites en [TECNICO](../docs/TECNICO.md#reproducibilidad).
+No abre hardware ni descarga pesos; requiere un wheel instalado previamente.

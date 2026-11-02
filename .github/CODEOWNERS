@@ -1,3 +1,3 @@
 # Sin reglas de revisores automáticos ni aprobaciones obligatorias.
 # Los responsables y la reserva de archivos se documentan en AGENTS.md.
-# Mantener sin reglas @usuario. La integración exige checks y recepción I00-I08.
+# Mantener sin reglas @usuario. Checks y recepción se explican en docs/ROADMAP.md.

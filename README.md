@@ -1,67 +1,62 @@
 # VisionX
 
-Anteojos con cámara estéreo que le dicen por voz a una persona con baja visión dónde están las cosas.
-TPF de I308 Visión Artificial, UdeSA, Primavera 2026. El plan operativo vigente está en
-[`docs/coordinacion/PLAN.md`](docs/coordinacion/PLAN.md). Propuesta para la cátedra en `entregas/`.
+Proyecto de I308 Visión Artificial, UdeSA, primavera 2026. Buscamos que una cámara estéreo
+ayude a una persona con baja visión a buscar objetos, consultar distancias, leer y describir
+escenas mediante audio. Primero funcionará por USB en computadora; después incorporará
+Raspberry, batería y las capacidades del roadmap completo.
 
-**Antes de trabajar, leer [`AGENTS.md`](AGENTS.md)**: reglas para las dos personas y sus agentes.
+## Por dónde empezar
 
-## Entorno
+| Archivo | Para qué leerlo |
+|---|---|
+| [ROADMAP](docs/ROADMAP.md) | Entender el proyecto, sus etapas, alternativas y las 20 tareas |
+| [TECNICO](docs/TECNICO.md) | Entender cada componente, sus entradas/salidas, decisiones y pruebas previstas |
+| [BITACORA](docs/BITACORA.md) | Saber qué se hizo realmente, qué falló y qué falta; base del informe final |
+| [AGENTS](AGENTS.md) | Trabajar con personas y agentes sin pisarse ni adelantarse al pedido |
 
-Requiere [uv](https://docs.astral.sh/uv/) y Python 3.11.18 (fijado en `.python-version`).
+Son documentos internos de aprendizaje y trabajo, no un texto para presentar al jurado.
+Las siglas se explican en TECNICO. La entrega es el **10 de diciembre de 2026**.
+Completar la entrega académica no equivale a terminar todas las capacidades de VisionX.
 
-```bash
-uv sync --locked            # dependencias base + herramientas de desarrollo
-uv sync --locked --extra ml # además PyTorch (MPS en la Mac, CUDA en la VM)
-uv run visionx doctor   # revisa OpenCV, ChArUco, WLS, config y PyTorch
-uv run pytest           # tests
-uv run ruff check .     # lint
-git config core.hooksPath .githooks   # una vez por clon: activa los hooks
+## Estado real
+
+Hay entorno, contratos y geometría compartida, validadores, tests y utilidades de diagnóstico.
+La aplicación completa, la CNN entrenada, los comparadores y las mediciones físicas siguen
+pendientes. Los detalles y la evidencia están en ROADMAP y BITACORA.
+Esta revisión documental no implementa los módulos futuros.
+
+## Preparar el entorno cuando se vaya a implementar
+
+Python 3.11.18 y [uv](https://docs.astral.sh/uv/). Desde el repositorio:
+
+```text
+uv sync --locked
+git config core.hooksPath .githooks
+uv run visionx doctor
 ```
 
-Preparación Windows/Mac: [C04](docs/coordinacion/C04.md). Cada clon activa sus hooks;
-la CI de GitHub no reemplaza la verificación del equipo físico.
+Las tareas neuronales usan `uv sync --locked --extra ml`; los modelos/pesos se obtienen
+por separado y se verifican antes de usarlos. `configs/local.yaml` solo se carga si se elige
+explícitamente con el mecanismo indicado por el comando; existir no lo activa.
+Una instalación distribuida usa `visionx doctor --runtime-only`.
+Consultar TECNICO para las verificaciones futuras; no ejecutarlas por leer este README.
 
-## Estructura
+## Qué carpetas quedan
 
-```
-configs/        configuración (default.yaml) y, más adelante, calibraciones elegidas
-src/visionx/
-  shared/       contratos entre módulos, config y reloj común
-  devtools/     registro de trabajo y otras herramientas del equipo
-  cli.py        comando `visionx` (doctor, log)
-tests/          tests que corren sin cámara ni GPU
-scripts/        utilidades de una sola vez (descargas, preprocesado)
-docs/           consignas, propuesta y decisiones (docs/decisiones/)
-entregas/       documentos para la cátedra
-```
+`src/` contiene código; `tests/` sus pruebas; `configs/` parámetros; `scripts/` utilidades.
+`docs/` contiene los tres documentos principales y referencias originales de la materia.
+`entregas/` conserva la propuesta HTML/PDF anterior: sus cifras son propuestas, no mediciones,
+y hay que sincronizarla antes de una nueva entrega. Datos, videos y pesos van al almacén compartido.
 
-Las carpetas por módulo (`camera/`, `calibration/`, `depth/`, `detection/`, `speech/`, `modes/`,
-`gui/`, `transport/`) se agregan cuando se empieza cada uno.
+El plan distribuido anterior y los registros originales se pueden recuperar desde el historial
+de Git. La correspondencia de sus IDs está al final de ROADMAP. No hay que navegar por
+esas fichas para empezar una tarea nueva. `docs/CONTRATOS.md` queda solo como enlace de
+compatibilidad, porque hay comentarios del código publicado que apuntan a esa ruta.
 
-## Coordinación
+Para ponerse al día, Bauty puede actualizar su `main` limpio con `git pull --ff-only` y abrir
+los tres documentos. Si hay cambios locales o una tarea en curso, conservarlos y actualizar
+su rama según AGENTS; no descartar trabajo para forzar el pull.
 
-- Reglas y procedimiento: [`AGENTS.md`](AGENTS.md).
-- Tablero/arranque: [`TAREAS.md`](docs/coordinacion/TAREAS.md).
-- Índices y estados: [A, Bauty](docs/coordinacion/A.md) y [B, Tomás](docs/coordinacion/B.md);
-  especificaciones en [fichas individuales](docs/coordinacion/tareas/).
-- **Cuándo combinar resultados:** [I00-I08](docs/coordinacion/INTEGRACIONES.md).
-- [Métricas](docs/coordinacion/METRICAS.md), [contratos objetivo](docs/CONTRATOS.md) y
-  [entrega de artefactos](docs/coordinacion/ARTEFACTOS.md).
-- [Flujo Git](docs/coordinacion/FLUJO.md): una rama/worktree por tarea, checks y merge del autor;
-  **sin aprobación obligatoria del compañero**. Después se verifica recepción técnica.
-- Registro de trabajo: [`docs/log/`](docs/log/), un archivo por entrada (`uv run visionx log "tema"`).
-- Decisiones: [`docs/decisiones/`](docs/decisiones/).
-
-## Hitos acordados
-
-Entrega 10/12/2026: cuatro modos USB y evaluación científica. Continuidad: Raspberry/batería,
-Lite y alerta; sin SLAM/memoria. [Plan v2](docs/coordinacion/PLAN.md),
-[auditoría](docs/coordinacion/AUDITORIA.md) y [decisión](docs/decisiones/0002-entrega-usb-y-alcance-completo.md).
-
-## Instalación distribuida (B27.1)
-
-El wheel incluye la configuración por defecto. Fuera del checkout ejecutar
-`visionx doctor --runtime-only`; para overrides explícitos usar `--config archivo.yaml`.
-`visionx log` es una herramienta del checkout, no del runtime distribuido.
-[Comandos y prueba aislada](docs/coordinacion/RECEPCION-B27.md).
+`visionx log` y `visionx novedades` todavía usan el esquema documental anterior: no muestran
+ni mantienen estos archivos nuevos. Hasta adaptar esas utilidades, escribir directamente en
+BITACORA y consultar ROADMAP. No perder resultados por confiar en el comando heredado.
