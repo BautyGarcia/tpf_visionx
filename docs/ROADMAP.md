@@ -165,7 +165,7 @@ si hay código integrado pero falta recepción, escribir ambos hechos sin oculta
 |---|---|---|---|---|
 | T01 | Base reproducible, contratos y artefactos | A+B | Parcial: base publicada; recepción/almacén y utilidades pendientes | Ninguna |
 | T02 | Captura USB, grabación y replay | B | Pendiente | Ninguna |
-| T03 | Calibración y validación física | B con evaluación A | Pendiente | Ninguna |
+| T03 | Calibración y validación física | B con evaluación A | En curso: calibrador propio; deriva térmica medida, falta sesión s6 en régimen estable y cinta métrica | Bauty+Tomás, rama `a/T03-calibrador`, `src/visionx/calibration/`, ELP en Mac de Bauty |
 | T04 | Datos, GT, particiones y protocolo | A con capturas B | Pendiente | Ninguna |
 | T05 | Estéreo, monocular, alineación y B0–B4 | A | Pendiente | Ninguna |
 | T06 | Detección, máscaras y seguimiento | B | Pendiente | Ninguna |
