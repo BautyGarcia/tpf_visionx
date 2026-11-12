@@ -40,6 +40,92 @@ En documentación puede escribirse «sin pruebas de software ni mediciones; revi
 y diff». En una medición real, conservar CSV/JSONL/artefacto verificable; un texto sin datos
 no reemplaza la evidencia. No pegar secretos, pesos ni videos en esta bitácora.
 
+## 2026-11-12 — Modos de la ELP, control entre días y cinta de 1 a 3 m
+
+**Tarea:** T03 (y medición de hardware para T02). **Personas/agente:** Bauty / Claude Code.
+**Rama:** `a/T03-calibrador` (local).
+
+**Objetivo.** Cerrar el trabajo físico pendiente para que el resto avance solo con código: modos
+reales de la cámara, estabilidad de la calibración s6 al día siguiente y prueba con cinta bien
+montada, incluidos 2,5 y 3 m.
+
+**Hecho.** Scripts del scratchpad del agente pasados a `scripts/calibracion/` (`auto_captura`,
+`cinta`, `modos`, `deriva_captura`, `zonas`, `control`); en `cinta.py` se corrigió que la
+primera medición se numeraba 0. Equipo: Mac arm64, macOS 15.7.3, OpenCV 5.0.0, ELP en `--video 1`
+sobre la mesa. Datos locales en `docs/i308-calib-tp2-antiguo/data/` (ignorados por Git; tienen
+personas, no se suben).
+
+**1. Modos y captura larga (`modos.py`, `modos-elp/`), 17:26–18:07.**
+
+| Pedido | Entregado | FPS medidos (8 s) |
+|---|---|---|
+| 3840×1080 | 3840×1080 | 59,9 |
+| 2560×960 | 2560×720 | 59,5 |
+| 2560×720 | 2560×720 | 59,8 |
+| 1920×1080 | 2560×720 | 59,6 |
+| 1280×480 | 1280×480 | 58,5 |
+| 640×240 | 640×240 | 59,0 |
+
+`CAP_PROP_FPS` informa 5,0 en todos: no sirve, hay que medir. Si el modo pedido no existe, la
+cámara entrega otro sin error. Corrida larga 2560×720 10 min: 59,32 fps promedio, 0 lecturas
+fallidas, peor segundo 51 cuadros. 3840×1080 30 min: 107 072 cuadros, 59,48 fps promedio,
+0 lecturas fallidas, peor segundo 40 cuadros (1 de 1800 segundos bajo 50), 6274 intervalos
+> 24 ms (máximo 289 ms), memoria máxima del proceso 309 MB estable. Esto también calentó la
+cámara 41 min antes de las pruebas siguientes.
+
+**2. Control entre días (`nov2026-s7-control/`, 13 pares, 18:08–18:13, `control.py` con
+`configs/calib/elp-2026-11-11.yaml`).** Vertical mediana 0,117 px, P95 0,46 px (ayer en
+validación 0,121 / 0,38): la rectificación sigue valiendo; los ojos no se movieron entre sí.
+Escala mediana **+1,33 %** (−1,28 a +3,83 %), contra +0,35 % en la validación de ayer: corrimiento
+en la dirección de la disparidad, confirmado por la cinta.
+
+**3. Cinta (`cinta.py`, `cinta-s7/`, 18:19–18:35).** Damero vertical, de frente (giro 0,6°/0,9°
+medido en la escena) y centrado sobre el borde delantero de una banqueta; cinta sobre el piso
+desde la vertical del vidrio de la lente a la de la cara impresa. 3 pares por medición. La lectura
+de 1,5 m se cargó primero como 1,51 por error de tipeo y se corrigió en el CSV a 1,50.
+
+| Cinta | Estéreo | Error | Estéreo corregido | Error | Un solo ojo (PnP) | Ancho (px) |
+|---|---|---|---|---|---|---|
+| 1,00 m | 1,030 m | +30 mm | 1,000 m | +0,3 mm | 1,017 m | 180,2 |
+| 1,50 m | 1,542 m | +42 mm | 1,494 m | −5,9 mm | 1,515 m | 121,3 |
+| 2,00 m | 2,075 m | +75 mm | 2,000 m | −0,5 mm | 2,019 m | 90,7 |
+| 2,50 m | 2,609 m | +109 mm | 2,499 m | −1,0 mm | 2,535 m | 72,3 |
+| 3,00 m | 3,153 m | +153 mm | 3,001 m | +0,6 mm | 3,043 m | 60,2 |
+
+- Montaje verificado sin la calibración: ancho a 1 m / ancho a 2, 2,5 y 3 m = 1,986 / 2,492 /
+  2,994 (cinta: 2 / 2,5 / 3). A diferencia del 11/11, las distancias de cinta son confiables.
+- El error del estéreo crece con la distancia (+3,0 % a 1 m, +5,1 % a 3 m): firma de un
+  corrimiento constante de disparidad, no de un error de escala. Modelo
+  `Z = fB / (fB/(cinta + c) − δ)` con fB = 601,0 px × 59,81 mm: ajustado con 1, 2, 2,5 y 3 m da
+  **δ = 0,525 px** (disparidad medida menor que la real) y **c = 14 mm** (centro óptico detrás
+  del vidrio); residuos ±1,1 mm. Medición de control 1,5 m, no usada en el ajuste: predicción
+  1,548 m, medido 1,542 m (−6 mm); corregido, −5,9 mm (0,4 %) contra +42 mm sin corregir.
+- Con un solo ojo la distancia queda 1,0133 × cinta (intercepto ≈ 0): +1,3 % proporcional. El
+  damero impreso mide exactamente 380 × 266 mm (10 × 7 cuadrados de 38 mm, regla): no viene de
+  ahí. Queda sin explicar (fx o centro óptico); no afecta al estéreo corregido.
+- El damero se detectó hasta 3 m (60 px de ancho) con la detección del repo a resolución completa.
+
+**Interpretación.** δ es el mismo tipo de corrimiento horizontal que midió `deriva-1`: entre la
+calibración del 11/11 y hoy la disparidad se corrió ~0,4–0,5 px (escala +0,35 → +1,3 %) con la
+cámara caliente en ambos casos. Recalibrar no lo evita si vuelve a correrse; se corrige con un
+desplazamiento de disparidad que se puede volver a medir con una o dos distancias de cinta.
+
+**Límites.** Un día, un montaje, 5 distancias, 3 pares cada una; δ y c se ajustaron con 4 de
+ellas y se validaron con 1. No se sabe si δ es estable entre días (lo indicaría repetir 2
+distancias otro día) ni su dependencia con la temperatura más allá de la prueba `deriva-1`.
+Los modos no prueban grabación a disco ni replay (T02).
+
+**Decisión pendiente (Bauty + Tomás).** La aceptación de T03 pide «ninguna corrección manual
+de metros». Un `disparity_offset_px` ajustado con cinta es un parámetro de calibración con
+procedimiento, datos y una distancia de control, no un factor a mano sobre los metros; pero hay
+que decidir si se acepta así, o si se prefiere recalibrar inmediatamente antes de medir y
+documentar el corrimiento de ~0,5 px como error de la cámara.
+
+**Próximo paso (código, sin hardware).** Si se acepta: T03/T05 agregan a la calibración el
+`disparity_offset_px` (0,525) y su procedencia, lo aplican al convertir disparidad en profundidad
+con tests sintéticos y vuelven a correr las 5 mediciones de `cinta-s7` como verificación. T02: usar 3840×1080 a ~60 fps medidos, validar el tamaño entregado y no confiar en
+`CAP_PROP_FPS`. Físico pendiente solo con T04/T06/T08/T10 (grabaciones) y T15/T19 (demo).
+
 ## 2026-11-11 — Sesión s6 en régimen estable: calibración elegida y prueba con cinta
 
 **Tarea:** T03. **Personas/agente:** Bauty / Claude Code. **Rama:** `a/T03-calibrador` (local).

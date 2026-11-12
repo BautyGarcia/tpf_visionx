@@ -164,8 +164,8 @@ si hay código integrado pero falta recepción, escribir ambos hechos sin oculta
 | ID | Capacidad | Integra | Estado al 02/11 | Reserva activa |
 |---|---|---|---|---|
 | T01 | Base reproducible, contratos y artefactos | A+B | Parcial: base publicada; recepción/almacén y utilidades pendientes | Ninguna |
-| T02 | Captura USB, grabación y replay | B | Pendiente | Ninguna |
-| T03 | Calibración y validación física | B con evaluación A | En curso: calibración s6 elegida (`configs/calib/elp-2026-11-11.yaml`, escala +0,29 % en validación); cinta absoluta sin confirmar por el montaje, falta 3 m | Bauty+Tomás, rama `a/T03-calibrador`, `src/visionx/calibration/`, ELP en Mac de Bauty |
+| T02 | Captura USB, grabación y replay | B | Pendiente; modos ELP y 10/30 min medidos en Mac (BITACORA 2026-11-12, `scripts/calibracion/modos.py`), falta Windows | Ninguna |
+| T03 | Calibración y validación física | B con evaluación A | En curso: calibración s6 (`configs/calib/elp-2026-11-11.yaml`); cinta 1–3 m hecha: +3 a +5 % por corrimiento de disparidad ~0,5 px, corregible a < 0,5 %; decidir si se acepta esa corrección (BITACORA 2026-11-12) | Bauty+Tomás, rama `a/T03-calibrador`, `src/visionx/calibration/`, `scripts/calibracion/`, ELP en Mac de Bauty |
 | T04 | Datos, GT, particiones y protocolo | A con capturas B | Pendiente | Ninguna |
 | T05 | Estéreo, monocular, alineación y B0–B4 | A | Pendiente | Ninguna |
 | T06 | Detección, máscaras y seguimiento | B | Pendiente | Ninguna |
