@@ -40,6 +40,59 @@ En documentación puede escribirse «sin pruebas de software ni mediciones; revi
 y diff». En una medición real, conservar CSV/JSONL/artefacto verificable; un texto sin datos
 no reemplaza la evidencia. No pegar secretos, pesos ni videos en esta bitácora.
 
+## 2026-11-11 — Sesión s6 en régimen estable: calibración elegida y prueba con cinta
+
+**Tarea:** T03. **Personas/agente:** Bauty / Claude Code. **Rama:** `a/T03-calibrador` (local).
+
+**Hecho.** Cámara sobre la mesa, transmitiendo desde ~19:00; primera foto después de 40 min.
+Para disparar sin tocar la computadora se usó `auto_captura.py` (scratchpad del agente): guarda el
+par cuando los dos ojos ven el tablero entero y quieto 1 s, y exige mover el tablero entre fotos.
+`nov2026-s6`: 82 pares (bloques A–E del plan, revisados por zona después de cada bloque y
+completados donde faltaba) y, en la misma corrida y sin cerrar la cámara, `nov2026-s6-val`:
+20 pares nuevos (9 zonas a ~0,6 m, 4 esquinas, 7 entre 0,9 y 1,6 m). Calibración copiada a
+`configs/calib/elp-2026-11-11.yaml` y referenciada en `configs/default.yaml`.
+
+**Evidencia/resultados.** `calibrar --sesion nov2026-s6/calib --validacion nov2026-s6-val/calib
+--tablero 9x6 --cuadrado-mm 38` (OpenCV 5.0.0) → `rational+refinado`,
+`elp-1920x1080-rational-ac282a037f`: 81 pares de ajuste (1 descartado, 0,78 px en un ojo),
+RMS 0,215 px; en los 20 de validación transferencia mediana 0,237 px, vertical mediana 0,122 px,
+P95 0,379 px, **escala +0,29 %**; fx 602,0 px, baseline 59,81 mm. `pinhole5`, `rational` y sus
+refinados dan fx 602–606 px y escala +0,05 a +1,30 %; `fisheye` falló al inicializar.
+Comparado con s5: P95 vertical 0,42 → 0,38 px y escala en validación −2,47 % → +0,29 %.
+- Cobertura: abajo y a los costados el tablero llegó a 17–58 px del borde; arriba, a 178 px
+  como mínimo (Bauty sostenía el tablero a la altura del pecho). Las esquinas de arriba quedaron
+  con 3 fotos cada una pero sin la franja superior (~15 % de la imagen).
+- Escala por foto en validación: +0,02 a +1,26 %; en las tres más lejanas (1,4–1,6 m) +0,5 a +0,7 %.
+
+**Prueba con cinta (`cinta.py`, scratchpad).** Tablero apoyado en un banquito, centrado y de
+frente; 3 pares por medición; distancia desde el punto medio entre lentes al centro del damero.
+Bauty midió sobre el piso, entre la vertical del vidrio de la cámara y la del damero.
+
+| Cinta | Estéreo | Un solo ojo (PnP) | Ancho del damero |
+|---|---|---|---|
+| 1,000 m | 1,189 m | 1,183 m | 154,7 px |
+| 1,500 m | 1,701 m | 1,687 m | 108,8 px |
+| 2,000 m | 2,206 m | 2,183 m | 84,0 px |
+
+El error es casi constante (+19 a +21 cm). Sin usar la calibración, el ancho en píxeles a
+"1 m" dividido por el de "2 m" da 1,842 (debería dar 2,000 si el damero hubiera estado a 1 y 2 m
+del lente); solo cierra con distancias reales de ~1,19 / 1,69 / 2,19 m, que es lo que mide la
+cámara. Una segunda medición "a 1 m" con el banquito movido dio 1,10 m (ancho 167 px): la
+posición del damero respecto de la marca del piso cambió ~9 cm entre dos montajes con la misma
+lectura de cinta. Conclusión: el desvío está en el montaje (damero apoyado atrás en el asiento e
+inclinado), no en la calibración. Los desplazamientos de 0,5 m entre posiciones, donde ese
+desvío se cancela, dan 0,513 y 0,504 m en estéreo y 0,504 y 0,496 m con un solo ojo (≤ 2,5 %).
+
+**Límites.** La distancia absoluta con cinta queda **sin confirmar** (montaje ambiguo); la escala
+está respaldada por el tamaño conocido del damero hasta ~2,2 m (+0,3 a +0,9 %) y por los
+desplazamientos relativos. Sin datos más allá de 2,2 m. La franja superior de la imagen no tuvo
+puntos. La deriva térmica sigue: la calibración vale con la cámara caliente (≥ 40 min). Las
+imágenes tienen a una persona y no se suben.
+
+**Próximo paso.** Si hace falta para el informe, repetir la cinta con el damero vertical sobre el
+borde delantero de un apoyo y marcas tomadas pegadas a la cara impresa y al vidrio; agregar un
+marcador grande para 3 m. Precalentar la cámara antes de medir o hacer la demo (T05).
+
 ## 2026-11-11 — Sesión s5 con damero A3 y calibración preliminar
 
 **Tarea:** T03. **Personas/agente:** Bauty / Claude Code. **Rama:** `a/T03-calibrador` (local).
