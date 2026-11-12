@@ -1,0 +1,379 @@
+formato: visionx-calibracion-estereo
+version: 1
+calibration_id: elp-1920x1080-rational-cc425d4937
+modelo: rational
+tamaño_imagen:
+- 1920
+- 1080
+unidades: K/P en píxeles; T y baseline en metros
+baseline_m: 0.0598170536716804
+alpha: 0.0
+izquierda:
+  K:
+  - - 590.3603382736832
+    - 0.0
+    - 966.3049792354356
+  - - 0.0
+    - 587.7989546674011
+    - 539.6912600521637
+  - - 0.0
+    - 0.0
+    - 1.0
+  D:
+  - 1.327376652367843
+  - 1.6964796300025682
+  - -0.0003320125117485855
+  - -0.0005067909186824811
+  - 0.22359593715618342
+  - 1.3949155893925447
+  - 1.5778698016389483
+  - 0.37929088039219006
+  - 0.0
+  - 0.0
+  - 0.0
+  - 0.0
+  - 0.0
+  - 0.0
+derecha:
+  K:
+  - - 589.7761982403351
+    - 0.0
+    - 950.0684787887764
+  - - 0.0
+    - 587.4394490928586
+    - 527.6763822655455
+  - - 0.0
+    - 0.0
+    - 1.0
+  D:
+  - 0.9238712295235838
+  - 1.2205426682402294
+  - -0.0007440875304294065
+  - -0.000572334656590024
+  - 0.2197874589283492
+  - 0.9792402488494352
+  - 1.1225773971279185
+  - 0.3407775400789578
+  - 0.0
+  - 0.0
+  - 0.0
+  - 0.0
+  - 0.0
+  - 0.0
+R:
+- - 0.9999532997501739
+  - -0.0006026315876638573
+  - 0.009645473234036538
+- - 0.0005764493311483204
+  - 0.9999961427725316
+  - 0.002717010531295899
+- - -0.009647073385622408
+  - -0.00271132351963094
+  - 0.9999497900894146
+T:
+- -0.059815778930532894
+- 0.00016153224831880314
+- -0.0003555393467167179
+rectificacion:
+  R1:
+  - - 0.9998730933433378
+    - -0.0033191618958558246
+    - 0.015581411114979434
+  - - 0.003297924607323193
+    - 0.9999935978797966
+    - 0.001388485759435727
+  - - -0.015585919969938192
+    - -0.0013369232322172693
+    - 0.9998776383812982
+  R2:
+  - - 0.9999786893357453
+    - -0.0027004380591113507
+    - 0.005943778987654164
+  - - 0.002708535466105376
+    - 0.9999954142938876
+    - -0.0013547054384255375
+  - - -0.005940093433105719
+    - 0.001370775504943523
+    - 0.9999814179596145
+  P1:
+  - - 586.9193865627865
+    - 0.0
+    - 919.8333740234375
+    - 0.0
+  - - 0.0
+    - 586.9193865627865
+    - 528.2515335083008
+    - 0.0
+  - - 0.0
+    - 0.0
+    - 1.0
+    - 0.0
+  P2:
+  - - 586.9193865627865
+    - 0.0
+    - 919.8333740234375
+    - -35.10778844697593
+  - - 0.0
+    - 586.9193865627865
+    - 528.2515335083008
+    - 0.0
+  - - 0.0
+    - 0.0
+    - 1.0
+    - 0.0
+  Q:
+  - - 1.0
+    - 0.0
+    - 0.0
+    - -919.8333740234375
+  - - 0.0
+    - 1.0
+    - 0.0
+    - -528.2515335083008
+  - - 0.0
+    - 0.0
+    - 0.0
+    - 586.9193865627865
+  - - 0.0
+    - 0.0
+    - 16.717640515842337
+    - -0.0
+  roi_izquierda:
+  - 0
+  - 0
+  - 1920
+  - 1079
+  roi_derecha:
+  - 0
+  - 0
+  - 1920
+  - 1080
+info:
+  creado: '2026-11-04T21:31:51-03:00'
+  opencv: 5.0.0
+  tablero:
+    tipo: damero
+    esquinas_internas:
+    - 9
+    - 6
+    cuadrado_m: 0.028
+  candidato: rational+refinado
+  metricas:
+    rms_ajuste_px: 0.19851942753984228
+    pares_ajuste: 44
+    pares_validacion: 14
+    pares_descartados: 9
+    validacion_transfer_median_px: 0.2885405580659795
+    validacion_transfer_rms_px: 1.0556034826554412
+    validacion_vertical_median_px: 0.15873216743733565
+    validacion_vertical_p95_px: 2.6839323306065808
+    validacion_scale_error_median: 0.0010869373943501737
+    validacion_n_moved: 3.0
+    validacion_clean_transfer_median_px: 0.25319906615887916
+    validacion_clean_transfer_rms_px: 0.3250808506319568
+    validacion_clean_vertical_median_px: 0.11522507850418151
+    validacion_clean_vertical_p95_px: 0.3992450198206372
+    validacion_clean_scale_error_median: 0.0009713412000504906
+  sesiones:
+  - nov2026-s2
+  - nov2026-s3
+  pares_ajuste:
+    nov2026-s2#1:
+      izquierda: 1220a8bee1ea5b81a4ef302dd8da2cd822624e2b374003a089d902fb86c3857f
+      derecha: 03f4d0de71549294b9922771a148bf4016c10c09040ecb009ca7f796e33a26cd
+    nov2026-s2#2:
+      izquierda: feb24b7ad67f84ab2a623b148ccdc2a38d3de5ffeeda1121fd53087f2b0788b0
+      derecha: 77ae4bf9cc11dca3cfbb45c8f8dce98f5da13c642031ab08b11fc4f809e30e44
+    nov2026-s2#4:
+      izquierda: a1839285050f224644f59de12675d05044ad1381065e67e519d322cea9e56825
+      derecha: ef072467820ccf66e042158bcb4168160fe5556bc792d4a2d88e1034f3238bb7
+    nov2026-s2#5:
+      izquierda: 512e35420ab58684c0b856f767d5660fb26708c874971357d0e6ca3772027bce
+      derecha: a8b31e29cfb28a06cca5e396adf9e4a6418ca11cda6b1cf9c6da5415d9d2a6dc
+    nov2026-s2#6:
+      izquierda: e9e3a77f06ed4137fbc10ea56a11d0f962acbe396f56170853a45042681aba26
+      derecha: a2fecef001dc5c5924e34e2c1fe46786f6041b12d07746981eba0a9d690df033
+    nov2026-s2#7:
+      izquierda: 04c5a49226ce098db279a209d4ba18c92a6c2d5ad179a7b5895cc494748669f8
+      derecha: acae8c392058aeb83c16a6730725092ae15e67f60edcbe4f3ea17e3f3810a711
+    nov2026-s2#9:
+      izquierda: 5e614a4370d9b754633a8eeb4253e5b0408fa65bc62af1723f53d56512765c43
+      derecha: 8f2cc8adbddb31b45c287d398ecc8e9c2f637a53d25153d7fa63db7f4247c05d
+    nov2026-s2#10:
+      izquierda: 6159acb6002905f44e692058695fed48b458133db8d618aa239a78043d296f98
+      derecha: 585774dc41fa6d0fa8a21bc6cb5154135bf73ca3437f3dab4dfdb7dcaf244947
+    nov2026-s2#11:
+      izquierda: 50e15875197ae4aec9d8337d19d71d83119ca13c90d906cf896cb454f709ca0e
+      derecha: a03a52fae63b154bfb6ef1b9374534e91ed6d7c4ad8a9f18fe8ac2274bb51f2f
+    nov2026-s2#12:
+      izquierda: 377db96b9f88008954324e564a8027e118dba18794c21de87067caca7bf1c948
+      derecha: 41125f24c6cff589b5a12d2a2c5961f50fcb9500353e5ab6e9b47be8ce8f1c15
+    nov2026-s2#14:
+      izquierda: 5e2b4a27d468bf44a4f6c5ceb9bcedf9fe71fa533d1abb8e26fff63b7e224ab1
+      derecha: 76986f3c744ee2ca035e08f20ce4dcf176309b22ead316d136ac7db5523893dc
+    nov2026-s2#15:
+      izquierda: 6f23cb1d502e0fb75a40df6b18ae60aef7a71d77501669a6d3f3ceec3e317e8f
+      derecha: ff79ff236d545f7c96f4a3aa5514939322bacb829d3f4e45791abfa80c666398
+    nov2026-s2#16:
+      izquierda: 15b42025edf19140fa6a7b7ca168bfb99abd1263686732d09253795c3f00b871
+      derecha: 6a83c25325af6da65e3f831e0d50b0dd6ae3bd8477d2cce7bd1a01293439c2e7
+    nov2026-s2#17:
+      izquierda: f2ce978808c04f5ede38a919eec1a23dcea8f1cfc6506940ddf5c8f48fd351f4
+      derecha: e21dd537deefd2414ee6ea73744cb815375d1f37207065a4fc15f47596a34725
+    nov2026-s2#19:
+      izquierda: a1eb1249480988294d851f52030e2cc3b1087994c5fce5c4fcc1c9bb5a4fb4d7
+      derecha: e7adc8a7e32a995b85cfcc1a356129caae55dd731122013f3377d426383efed6
+    nov2026-s2#20:
+      izquierda: 8d1474ff4d4f56fe62e0ab0e79b287d91fda38f03845610d99460fed2bd85366
+      derecha: bf41e8d1e47eafb8fc9e2b2a00c303d3f8f4a3834e2ed9d4534c4f825cdf4553
+    nov2026-s2#21:
+      izquierda: ef2157799fc58c6cc90d70e634e72490a384f3f06719b85480715137f6e73ffd
+      derecha: e3c285fd17741e6db4b2f1c43c245d61f80e724e3cfe328a60d3cc028292f2c6
+    nov2026-s2#22:
+      izquierda: 88c456795d27e3628597ee3ae7853f36e9f3b1e7fc996287c5d8dd64c8be9331
+      derecha: 0662ba9a80ad1634caa686c9f9a650d97f8d426384894c9df93f9889946b90e6
+    nov2026-s2#24:
+      izquierda: 15ae42948f1c4cedb48fae3dc049279f402627144c46a1a72f8e2359b684cea5
+      derecha: f4e805ade06ff247cadc5770ea08f1f3f84bbc45f34a50319831d20602ba96a1
+    nov2026-s2#25:
+      izquierda: bb916d51dbedaec7ea554f940efc3f28e2a3db21b9bd09bb4117372835fbf772
+      derecha: 5c06902a123fe06125f8fd8d56b8187c15505375bd3ec091a927de273629a760
+    nov2026-s2#26:
+      izquierda: d70661f471db2b877430e0bd1ca0f4a8a73b00a1810b701c0547f143cc57be1a
+      derecha: c5434cdb8e30d14bbce5747df59fff11f9828d62612778052796ac02f08a017a
+    nov2026-s2#27:
+      izquierda: eee858d842b9cb5bedce791a607f5457d89cf8cb677f3e197f48894033c52726
+      derecha: c78ad533c113eacedaef4520a924b3956d1482bf0025965a38ddea1a826c69d8
+    nov2026-s2#29:
+      izquierda: 906bca8676861bb26941556fb373e8ea88215de8eb83ba47b98a3de8916ebf63
+      derecha: 6c7df88610a7a9eb23b4633976635877d4606c93bb54bdd06f88f2fb98b58ebe
+    nov2026-s3#1:
+      izquierda: f2aee2a0d9e31f92132ad87d3c0024257eb9c2eeade94f2e8ac1daee27dddfa2
+      derecha: 5dca5e8e7500c5e4fae78a879beb7b2a1c02b580e80284f760674834a52f0403
+    nov2026-s3#5:
+      izquierda: f99169b5b5a37cd57d0b49de0cebd21fb12db9c4b4538775902ac0dbfc4d9275
+      derecha: 6626bc56e6b54e77961a0c36e431246d92c10581b343633c3498a8ba9c61a726
+    nov2026-s3#6:
+      izquierda: 88b3405bc0222aab473012d48fe39e9e131aa2a199282336987691aee124b9cf
+      derecha: 5886923889c8fe9dc761462153eb124d763dc7ef8c274b51420e6fe12585f014
+    nov2026-s3#7:
+      izquierda: d09f422357322a43c9b2a0eacaa538f627cd3b4a14285002728fb02047b254e8
+      derecha: f416442a17b3da40d3eed5e1f8e8f20cf52e4d2f3e70eedcd8a26917557f6064
+    nov2026-s3#9:
+      izquierda: a791ab35712bfcf36deb8f6a68f59b6ace7d970583c6273474902f34c2c7fa6b
+      derecha: ebbd7884bbed07ae235bc632e287dc26212542bd731a8769b76ca3b3e7f30f7d
+    nov2026-s3#10:
+      izquierda: 170a53b0a0aa0bf5faeb202a66caef239e87aa8d1b253b29266020c8994b3fde
+      derecha: 72814682cefec0c0ff65d1c1ab7ca5d9c5591da173e3be099f8210dd283e6537
+    nov2026-s3#14:
+      izquierda: 04fbda8340605db3a3a65f22ddc586c4f51147f3a5bae3febac3731d856e777c
+      derecha: 25aec5c634d7f6451812ace16c3695a1d5ab95745741cfede244453bba3404fb
+    nov2026-s3#15:
+      izquierda: d14df88aa47fd9bfdaa5418d6f244872f5437ebecb62787fdd75ba4a50297e8a
+      derecha: e20f02a1dc53772de595453228123a3377bd0503364c94b4b937d5a597deb89d
+    nov2026-s3#16:
+      izquierda: b6089e32373bb18131662fc1f3d665cadf8f06df45ac6a323dcae18bc3e81c33
+      derecha: 89106b34db4e4a0f5639a38625030834762aaebdf4217340d5e4766c1413a7f7
+    nov2026-s3#17:
+      izquierda: 35c0c449298d8dbde5e2dbd1542885de82141aef29c07c72fe0c81370db9d335
+      derecha: 57133ba32c29ca57761c179bd971c16ea01db94e6dd05852e7b71a987bb985a2
+    nov2026-s3#19:
+      izquierda: 172372ab9051398572c66a52f700ed41f1999da67e1ab83d91ccc3154fd27856
+      derecha: cb6c97de7ad6c949735ad4a8c9c4997b0af54a03fc89dfdd4aa35c5c7c38c803
+    nov2026-s3#20:
+      izquierda: 0da8d08325fdeeaaf7c61f48277ba9d5189eee3186287a6e30ccb7417dee11e5
+      derecha: 9f1ecdc943c03b6300965a0bde90dc2e44e634f07049a0c607c62b19b9c64439
+    nov2026-s3#22:
+      izquierda: c9da3017b7fe872782e5005e5a4ae9de1e37a28209cc470c04717854dfae99ff
+      derecha: ea6a9360846e44a5e53ade78664855b3d2e9514c5a9a6f17e2de8e719afee81d
+    nov2026-s3#24:
+      izquierda: b011fcdf70a8d60b0db4288c61c56497bb20755df20a1b877a4ee0531281a827
+      derecha: 6fbdb9ccf39a3f3257ab46b63660b52dc13154d654cce95f16d88db156b6d18d
+    nov2026-s3#25:
+      izquierda: 0f4d8369a67ea842ee6a911193081ee9e7b98bbf0ba9e08801c91e546c0f4099
+      derecha: 966087ecbcf687ef172431f9739987c2627fc0300fa5b22fb2d6604c82b3df12
+    nov2026-s3#26:
+      izquierda: c8e02c3d500b16cb9b30a0e1130089c6214487e4f21a53b0408dd171f22c1c05
+      derecha: f6d7f226bf09260a6d89ab1b2a9a3c2d40493d7aada74784ce4652a4cad168a6
+    nov2026-s3#27:
+      izquierda: ef9d111a344f10b8d36c98cdcba6e5bff2992132817116a62458e68e3eb26825
+      derecha: 70fbf3b9133110f50c29f7522ec0c99d73b3ebef8a401a5ca4cad767f6abf73d
+    nov2026-s3#30:
+      izquierda: b4903c4bc65f03cd4d72d131925d844a6add4c5dc66d0422bde4f349f716a67f
+      derecha: 7a266e49a275117d8d3a79417c71b55966af57d9b776738eeca2133f603bcc27
+    nov2026-s3#34:
+      izquierda: c5ed890892cbae6f8064af14609baf55d3eb0d6f72c7bf804994d8a5d79fa7e3
+      derecha: 15299aae26d41d6123a29599ee5efe28100e5d4b8c27ebca6b469cef24257dd9
+    nov2026-s3#36:
+      izquierda: 357360cea0a0722c76257e7cb59c7a1623a9ea760a3a0267d08215fab33d7a7f
+      derecha: 436b70cd34dc52d2fda5eb83fa3982112fed1af90b7eaa8980d3b993581c27b8
+    nov2026-s3#37:
+      izquierda: 8afd8e9eb5f467ad555cfe69d9e67fd608b2618cd4ec0eca977cae571817df35
+      derecha: ff1005393c0b770f70e587a6dd47b8ee9146f579ee39126dec6a4f2c316c5e47
+  pares_validacion:
+    nov2026-s2#3:
+      izquierda: 4ee4f3c2ac0aaed0ba379aeff7bf20cfa4d28bf6c2b3290a501790b3630a2c38
+      derecha: dd2c942787cf9bbe3d9ee198310b97eb25f63abf891e099a7f409f61e66c2220
+    nov2026-s2#8:
+      izquierda: 8ddc8077c2209af68b40ff16b341ffa032e9084f4fc2b7bf991939bfe2a5d36d
+      derecha: 7fda96c59886892387938b6ec98223cc715b3243da8c71aab46e0cfde508947e
+    nov2026-s2#13:
+      izquierda: 45891af29dde1ae7c7cbd00156c0fb47df93b6032983cde4a0b67282523821f0
+      derecha: 0c013d38678225a4646f1a4097f009bd1a06017decb4867b05f0a983f3c074be
+    nov2026-s2#18:
+      izquierda: eb802a4ffd65e9774436a52b3622b6b959dbc9c160ff768e96810c59b5955fc0
+      derecha: 29af5f4585681d117cf7691e5dae916a667b250b03f6e14621da2d57985076cf
+    nov2026-s2#23:
+      izquierda: d90d7e358e7b087a9ed27364eed55aeefa8eb58868d7e79ac2957d7a5c46e946
+      derecha: 816cdff1c2fdd50b5dd398e082292546ab7e01464a170ca4f955eb12ff9b7fb7
+    nov2026-s2#28:
+      izquierda: bee554d4a10cab2226fd3791b9df56ee50ff61b0781420c6da8e7990643ce1ac
+      derecha: 57bb70c2f7112499ed470d1874a1c7fd0f09cc5fef033698ba49f8e2e63f322b
+    nov2026-s3#3:
+      izquierda: 156acd76bc300609978e88eedb3104b8b47d2b9243e1836d576af359946b6f66
+      derecha: 69941c345f84a2c2f5b03ab8aa3e1b0cc1fe411c8672aca777ac6cf7f8ffe54e
+    nov2026-s3#8:
+      izquierda: c3564210e79012bf25ddf4ff872e44e4f9cf384747a0566052ce9d58c66a4345
+      derecha: 957b7cdba7a3f125fabefae9c4be7980bfb88f1895de9772722b299dc5769926
+    nov2026-s3#13:
+      izquierda: 37254549af496c19a5f79841d3247dbf977b0e2f39fac95c11a68aa41aea335b
+      derecha: 7a4cbc9fe921c391c4101ada9149587f2c0ad675e4f27e8fc30453af568706e8
+    nov2026-s3#18:
+      izquierda: d538810e094833a66938d5211b86861fd84dc46bd3a505ae7e71c21a4818a227
+      derecha: 939d9ea8cc72d3f7ebb03b960863e4ce467f8198d2eb509d15c3862031760e54
+    nov2026-s3#23:
+      izquierda: 4e61e9944dd397ecb2de42a72cf2fcff50ca25b7589558e86d77ba84f363552c
+      derecha: cdf76d9ef4b22b9803a9d9677ca90b6f3db39299c404082ef50439e9d278c93e
+    nov2026-s3#28:
+      izquierda: 7db13e4393e0a1c5482ae5455624f788d54dc272326ba28b88ca05ed22c40dd6
+      derecha: 4d5a38b6de5ab52351179f92df2cc346986c5142eead489bea26336dd86906ad
+    nov2026-s3#33:
+      izquierda: 90d282d685e38c927bffa395203cf1748f0675b4960fde42b96d72fa989437e2
+      derecha: 0d1c9f7f6b08dc0d40470c39fbc174225a7ccd8fed35b66d9b9a51116366468d
+    nov2026-s3#38:
+      izquierda: 912744e43a1e3f20f61ba87a6119b807d86cb1918ffca07f995f4201bcf569ba
+      derecha: ac34bc7fa61f5433bc131a51a1ebebe81224be04fb4219f2359523a945ffbcc4
+  descartados:
+    nov2026-s3#29: tablero inclinado 67°
+    nov2026-s3#31: tablero inclinado 71°
+    nov2026-s3#32: tablero inclinado 73°
+    nov2026-s3#35: tablero inclinado 65°
+    nov2026-s3#11: 'movimiento entre ojos: transferencia 1.00 px (umbral 0.76) con cada ojo bien'
+    nov2026-s3#4: 'movimiento entre ojos: transferencia 0.89 px (umbral 0.76) con cada ojo bien'
+    nov2026-s3#21: ojo izquierdo 0.82 px (umbral 0.75)
+    nov2026-s3#12: 'movimiento entre ojos: transferencia 1.56 px (umbral 0.87) con cada ojo bien'
+    nov2026-s3#2: 'movimiento entre ojos: transferencia 1.11 px (umbral 0.87) con cada ojo bien'
+  avisos: []
+  opciones:
+    models:
+    - pinhole5
+    - rational
+    - fisheye
+    alpha: 0.0
+    outlier_sigma: 4.0
+    outlier_floor_px: 0.75
+    max_rejected_fraction: 0.3
+    max_tilt_deg: 65.0
+    min_views: 12
+    validation_every: 5
+    tie_tolerance: 0.02

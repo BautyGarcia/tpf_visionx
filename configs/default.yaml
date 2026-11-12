@@ -9,7 +9,7 @@ camera:
   capture: [3840, 1080]     # par lado a lado, MJPEG
   fourcc: MJPG
   fps: 30
-  calibration: null         # ruta al YAML de calibración elegido (configs/calib/...)
+  calibration: configs/calib/elp-2026-11-11.yaml  # s6 en régimen estable, ver BITACORA 2026-11-11
 
 depth:
   compute: [1280, 720]      # resolución por ojo para profundidad
