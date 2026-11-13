@@ -40,6 +40,54 @@ En documentación puede escribirse «sin pruebas de software ni mediciones; revi
 y diff». En una medición real, conservar CSV/JSONL/artefacto verificable; un texto sin datos
 no reemplaza la evidencia. No pegar secretos, pesos ni videos en esta bitácora.
 
+## 2026-11-13 — Recepción en Windows de la calibración ELP y sus imágenes
+
+**Tarea:** T03 (recepción del consumidor, T01 para el almacén). **Persona/agente:** Tomás /
+Claude Code. **Rama:** `b/T03-recepcion` (local).
+
+**Hecho.**
+- `main` local actualizado a `69f1427` (PR #13 y #14 integrados). `configs/default.yaml`
+  apunta a `configs/calib/elp-2026-11-11-corregida.yaml`.
+- Las imágenes que Bauty subió al Drive `VisionX-artefactos/calibraciones/` se leyeron en la PC
+  de Tomás (Windows 11, Drive para escritorio, `G:\Mi unidad\VisionX-artefactos`). Hay carpetas
+  de todas las sesiones: `nov2026`, `nov2026-aaa`, `s2`–`s5`, `s5-val`, `s6`, `s6-val`,
+  `s7-control`, `cinta-s6`, `cinta-s7`, `deriva-1` y `modos-elp`. En total 978 archivos y
+  ~0,3 GB (tamaños leídos de los metadatos del disco sincronizado).
+
+**Evidencia.**
+- SHA-256 de `nov2026-s6/calib/*.jpg` y `nov2026-s6-val/calib/*.jpg` (206 imágenes en Drive)
+  comparados con los 202 hashes que listan `elp-2026-11-11.yaml` y `elp-2026-11-11-corregida.yaml`
+  (81 pares de ajuste + 20 de validación; ambos archivos listan los mismos): **202 de 202
+  coinciden, ninguno falta**. Las 4 imágenes extra no figuran en el YAML (probablemente el par
+  descartado y otro no usado); no se revisaron una por una.
+- `cinta-s7/`: 18 pares y `resultados.csv` con las 5 distancias; los valores coinciden con la
+  tabla de la entrada del 12/11. Las imágenes de cinta no tienen hashes registrados en el repo,
+  así que solo se verificó su presencia.
+
+**Corrección a entradas anteriores.** Las entradas del 11/11 y 12/11 dicen que las imágenes
+«tienen personas y no se suben». Ahora están en el Drive del equipo (carpeta de Tomás, Bauty
+editor), no en Git. El repositorio sigue sin datos crudos.
+
+**Problemas.**
+- `uv run pytest` no pudo ejecutarse en Windows: Control de aplicaciones de Windows bloquea
+  `.venv\Scripts\python.exe` (os error 4551). No hay verificación local de los 219 tests en
+  Windows; la evidencia de software sigue siendo la Mac de Bauty y la CI.
+- El conector de Drive de Claude usa otra cuenta y no ve la carpeta; la lectura se hizo por el
+  disco sincronizado.
+
+**Observación de revisión sobre δ.** La propia evidencia del 12/11 muestra que la disparidad se
+corrió ~0,4–0,5 px entre el 11/11 y el 12/11 con la cámara caliente: es el mismo δ que ahora se
+asume estable. Se discutió un chequeo corto antes de cada sesión del banco ELP y de la demo (dos
+distancias de cinta o `control.py`, reajustando con `offset_cinta.py` si δ se aparta).
+**Decisión (Tomás):** se mantiene la solución del PR #14 tal cual; el chequeo no se adopta.
+El límite «estabilidad de δ entre días no medida» sigue vigente para el informe.
+
+**Límites.** No se recalculó la calibración ni se corrió `offset_cinta.py` en Windows. No se
+verificaron modos de la ELP en Windows (pendiente T02).
+
+**Próximo paso propuesto.** Destrabar el entorno Windows (Control de aplicaciones) y correr la
+suite; luego T02 (captura, grabación y replay) sobre la calibración corregida, a confirmar por Tomás.
+
 ## 2026-11-13 — Corrección de disparidad implementada y verificada con cinta-s7
 
 **Tarea:** T03. **Persona/agente:** Bauty / Claude Code. **Rama:** `a/T03-offset-disparidad` (local).
