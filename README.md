@@ -35,6 +35,11 @@ git config core.hooksPath .githooks
 uv run visionx doctor
 ```
 
+En Windows con Smart App Control activado, los `.exe` que uv genera para los comandos
+(`visionx.exe`, `pytest.exe`) pueden quedar bloqueados («os error 4551»). Usar el intérprete:
+`uv run python -m visionx doctor` y `uv run python -m pytest`. Si el bloqueado es
+`.venv\Scripts\python.exe`, renombrar `.venv` y volver a correr `uv sync --locked`.
+
 Las tareas neuronales usan `uv sync --locked --extra ml`; los modelos/pesos se obtienen
 por separado y se verifican antes de usarlos. `configs/local.yaml` solo se carga si se elige
 explícitamente con el mecanismo indicado por el comando; existir no lo activa.
