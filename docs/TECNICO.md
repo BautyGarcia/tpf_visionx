@@ -518,9 +518,48 @@ No anunciar conteos definitivos copiados de propuestas: verificarlos en el manif
 En Middlebury leer focal/baseline/doffs/unidades de su calibración; no suponer centros iguales.
 [Convenciones de Middlebury](https://vision.middlebury.edu/stereo/data/scenes2014/).
 
-**Test público (decidido 13/11).** Middlebury 2014 es el principal. ETH3D two-view es
-secundario: sus imágenes están en escala de grises y DA V2/Fusion trabajan en color. Se replica
-el canal y se informa como limitación.
+**Test público (decidido 13/11).** Middlebury es el principal. Se usa el entrenamiento de
+**MiddEval3 a media resolución (H)**, que son los pares con GT pública: 15 pares en 12 escenas,
+10 de ellas de 2014. Es el protocolo de FoundationStereo: bad-2 sobre píxeles visibles en ambos
+ojos, a resolución H. ETH3D two-view es secundario: 27 pares en 7 lugares, interiores y exteriores
+hasta ~50 m. Sus imágenes están en escala de grises y DA V2/Fusion trabajan en color, así que se
+replica el canal y se informa como limitación.
+
+**Implementado (`src/visionx/depth/datasets/`, `python -m visionx.depth.datasets`).**
+- **Muestra común:** los adaptadores entregan `StereoSample`, con BGR uint8, disparidad float32
+  en px (NaN donde no hay GT), `valid`, `nonoccluded`, la geometría si el dataset la publica y la
+  escena. Así B0–B4 y Fusion leen igual cualquier dataset.
+- **Escenas:** las variantes de una misma escena (MotorcycleE, PianoL, PlaytableP, ArtL) comparten
+  escena. En ETH3D, `delivery_area_1l` y `_1s` también. InStereo2K no publica escenas y sus
+  cuadros consecutivos son el mismo armado con objetos movidos: la escena es un **tramo de 100
+  cuadros** consecutivos (`tramo-00` = 000001–000100, ...).
+- **Comandos:** `descargar` verifica SHA-256 antes de extraer, `manifiesto` escribe
+  `datasets/<nombre>.yaml` con hashes, licencia, reglas de GT y partición, y `verificar` compara
+  otra copia contra ese manifiesto. InStereo2K se baja a mano (OneDrive): los zip van en
+  `data/descargas/instereo2k/` y `descargar` controla su hash y los extrae.
+- **Particiones:** se reparten escenas, ordenadas por SHA-256 de semilla:escena. Validación de
+  InStereo2K: 10 % de los 21 tramos del dataset completo con la semilla `visionx-T04`
+  (`tramo-00` y `tramo-04`). Se elige sobre todos los tramos, no solo los descargados, para que
+  la partición no dependa de qué partes se consiguieron.
+- **InStereo2K disponible:** part2–4 y test, 1221 de 2050 pares (part1, part5 y part6 no se
+  pueden bajar de OneDrive). Quedan 1119 pares de train y 102 de val para Fusion (T12).
+- **Test oficial de InStereo2K:** son cuadros sueltos (000040, 000080, ...) intercalados en los
+  mismos tramos que train, así que no es independiente. No se usa como test: cada cuadro sigue
+  a su tramo.
+
+**Auditoría de GT.** Para verificar la GT sin confiar en el README, se corre la disparidad de
+−3 a +3 px y el parecido entre los ojos tiene que ser máximo exactamente en 0.
+- **Cómo se mide el parecido:** census 5×5, solo en píxeles con textura, con al menos 10 000
+  píxeles y un cociente menor a 0,95 contra ±3 px.
+- **Por qué census:** la resta de brillo marcaba como malas las variantes con otra exposición y
+  las superficies lisas, que no lo están.
+- **Qué detecta:** una escala o un signo mal leídos, por ejemplo ÷100 contra ÷1024 en InStereo2K.
+- **Veredicto por muestra:** *alineada* (curva marcada, mínimo a ≤ 0,5 px de 0), *desalineada*
+  (mínimo más lejos: evidencia positiva) o *no concluyente* (curva plana o ambigua por falta de
+  textura o textura periódica).
+- **Veredicto por dataset:** ninguna desalineada, ≤ 5 % no concluyentes y corrimiento subpíxel
+  mediano ≤ 0,25 px. Un error de lectura afecta a todas las muestras y salta acá aunque cada
+  una, sola, quede como no concluyente.
 
 **Banco ELP (decidido 13/11).** 40 escenas en 5 sesiones de 8, en lugares, días o iluminación
 distintos. Se divide **por sesión**: 2 sesiones de desarrollo (≈16 escenas: umbrales, política y

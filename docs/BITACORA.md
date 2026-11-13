@@ -40,6 +40,149 @@ En documentación puede escribirse «sin pruebas de software ni mediciones; revi
 y diff». En una medición real, conservar CSV/JSONL/artefacto verificable; un texto sin datos
 no reemplaza la evidencia. No pegar secretos, pesos ni videos en esta bitácora.
 
+## 2026-11-13 — T04: InStereo2K descargado (parcial), escenas por tramo y auditoría ajustada
+
+**Tarea:** T04. **Persona/agente:** Bauty / Claude Code. **Rama:** `a/T04-datos` (local).
+
+**Objetivo.** Incorporar InStereo2K, verificar su formato real y fijar una partición sin fuga.
+
+**Descarga (manual, OneDrive).**
+- Bajaron `part2.zip`, `part3.zip`, `part4.zip` y `test.zip`: 1171 pares de train y 50 de test,
+  5,2 GB extraídos. SHA-256 fijados en el catálogo.
+- **Faltan `part1`, `part5` y `part6`.** OneDrive dejó un aviso: la carpeta `train` de
+  «Instereo2K-part5-part6-test» no se descargó («This file cannot be downloaded»). `part1` no
+  vino en la descarga.
+- **Orden local:** los zip quedaron en `data/descargas/instereo2k/`, y `descargar instereo2k`
+  controla su hash y los extrae en `data/raw/instereo2k/`. Se borraron los avisos de OneDrive y
+  las carpetas vacías. Las descargas de MiddEval3 y ETH3D pasaron a `data/descargas/<dataset>/`.
+
+**Lo que mostraron los archivos reales.**
+- **Estructura:** `train/part<N>/<cuadro>/` y `test/<cuadro>/`, con `left.png`, `right.png`,
+  `left_disp.png` y `right_disp.png`. No es la de torchvision que suponía el lector. Imágenes de
+  1080×860.
+- **Numeración:** el número de cuadro es único en todo el dataset. El test oficial son cuadros
+  sueltos (000040, 000080, ..., 002006) intercalados en la misma secuencia que train.
+- **Cuadros consecutivos:** son el mismo armado, con objetos movidos y la cámara corrida (revisado
+  en mosaicos de 48 cuadros). «Una carpeta = una escena» habría puesto casi el mismo par en train
+  y en val.
+- **Escala:** con ÷100, como dice el README, la disparidad va de ~20 a ~265 px. Con ÷1024, como
+  supone torchvision, sería de 2 a 26 px, y la auditoría lo descartaría.
+
+**Decisiones.**
+- **Escena = tramo de 100 cuadros consecutivos** (`tramo-00` = 000001–000100, ...). Un armado
+  dura ~5–30 cuadros, así que solo los bordes de cada tramo pueden parecerse al vecino. Esa fuga
+  residual queda aceptada: InStereo2K val solo elige checkpoint; el test es Middlebury, ETH3D y ELP.
+- **Validación:** 10 % de los **21 tramos del dataset completo** con la semilla `visionx-T04`, es
+  decir `tramo-00` y `tramo-04`. Se elige sobre todos los tramos para que bajar las partes que
+  faltan no mueva nada de grupo. Hoy: 1119 pares de train y 102 de val, porque `tramo-00` solo
+  tiene los cuadros del test oficial.
+- **El test oficial no se usa como test:** comparte tramos con train. Cada cuadro sigue a su tramo.
+
+**Auditoría: el criterio se ajustó con las 1221 muestras.**
+- Con el criterio anterior, que exigía el mínimo exactamente en 0 y un cociente < 0,95, quedaron
+  27 marcadas.
+- **24 tenían el mínimo discreto en ±0,5 px.** Una parábola ubica el mínimo real a 0,25–0,32 px:
+  es menos que el paso del barrido y no indica una lectura errónea.
+- **9 tenían curva plana o ambigua:** pizarrón blanco, mesa blanca y pared de listones (textura
+  periódica). Se verificó la GT a mano en esquinas con correlación de parches sobre la fila: la
+  diferencia mediana contra la GT fue de −0,2 a +0,8 px en las 9, con una resolución del cruce de
+  ±0,5 px.
+- Un primer intento de esa verificación daba +15 px en todos los cuadros, también en los buenos:
+  era un error del script, que medía el borde del parche y no su centro. Se corrigió antes de
+  sacar conclusiones.
+- **Criterio nuevo:**
+  - Por muestra: *alineada*, *desalineada* (mínimo a más de 0,5 px de 0) o *no concluyente*.
+  - Por dataset: ninguna desalineada, ≤ 5 % no concluyentes y corrimiento subpíxel mediano
+    ≤ 0,25 px.
+  - Tests sintéticos: la escala ×100 o /2 y el signo invertido siguen fallando a nivel dataset.
+- También se corrigió `auditar --hojas 0`, que generaba hojas para todas las muestras en vez de
+  para ninguna.
+
+**Evidencia.**
+- InStereo2K, 1221 de 1221 pares auditados: 1214 alineados, 7 no concluyentes (000413, 000414,
+  000415, 000424, 000425, 000571, 002006), 0 desalineados. Corrimiento mediano: 0,044 px.
+- Con el criterio nuevo, MiddEval3 sigue 15/15 y ETH3D 27/27 alineadas, con corrimiento
+  mediano de −0,022 y −0,005 px.
+- Manifiesto `datasets/instereo2k.yaml` con 3663 archivos (580 kB).
+- `uv run pytest`: 240 aprobados (21 de datos). `ruff check` y `ruff format --check`
+  correctos.
+
+**Límites.**
+- Faltan part1, part5 y part6, ~40 % del train. **Bauty confirmó que no se pueden conseguir**:
+  trabajamos con estos 1221 pares (1119 train, 102 val). Si Fusion (T12) sobreajusta con este
+  volumen, se discute en T12; no se cambia el protocolo de T04 por eso.
+- La fuga en los bordes de tramo no está medida.
+- InStereo2K no tiene calibración, así que no da metros.
+
+**Próximo paso:** PR de T04 con InStereo2K parcial declarado. Después, T05 (SGBM, DA V2 y
+alineación B0–B4) sobre MiddEval3/ETH3D.
+
+## 2026-11-13 — T04: adaptadores de datos públicos, auditoría y manifiestos
+
+**Tarea:** T04. **Persona/agente:** Bauty / Claude Code. **Rama:** `a/T04-datos` (local).
+
+**Objetivo.** Leer los datasets públicos de forma única y verificable antes de T05/T12:
+- archivos con hash;
+- reglas de GT comprobadas en los datos;
+- particiones por escena;
+- diez o más muestras auditadas por adaptador.
+
+**Investigación previa** (subagente, fuentes oficiales y repositorios):
+- **InStereo2K:** según el README, la disparidad es PNG uint16 ×100 y 0 significa sin GT.
+  torchvision, en cambio, divide por 1024. Los links de OneDrive/Baidu están rotos para descarga
+  por script según los issues #10 y #11. No publica focal ni baseline.
+- **Middlebury:** solo el entrenamiento de MiddEval3 tiene GT pública.
+- **Papers zero-shot:** no comparten protocolo. FoundationStereo usa H y no ocluidos; DEFOM usa
+  todos los píxeles válidos.
+- **Licencias:** Middlebury y ETH3D no declaran licencia; piden citar el paper.
+
+**Hecho.**
+- **Paquete `src/visionx/depth/datasets/`:** lector PFM; `StereoSample`; lector de formato
+  Middlebury para MiddEval3 y ETH3D; lector de InStereo2K; catálogo con índice liviano y carga a
+  pedido; particiones por escena; auditoría; manifiestos. CLI con `descargar`, `auditar`,
+  `manifiesto` y `verificar`.
+- **Descargados en `data/` (ignorado por Git):** MiddEval3-data-H y GT0-H (163 MB) y ETH3D
+  two-view training más GT (29 MB). SHA-256 fijados en el catálogo.
+- **Manifiestos versionados:** `datasets/middeval3.yaml` y `datasets/eth3d.yaml`.
+
+**Lo que mostraron los archivos reales:**
+- La máscara vale 0 exactamente donde el PFM tiene infinito; 128 = ocluido, 255 = visible.
+- ETH3D trae imágenes en grises guardadas en 3 canales y 27 pares, no 16 como contó el
+  subagente.
+- `calib.txt` es coherente: doffs = cx1 − cx0.
+- Profundidad GT: Middlebury de 1 a 5 m (Pipes hasta 8,6 m); ETH3D hasta ~50 m.
+
+**Problema y cambio de método.**
+- La primera auditoría, que restaba brillos y exigía error con GT / error a ±2 px < 0,8, marcó 4
+  muestras de MiddEval3 y 8 de ETH3D como «desalineadas».
+- **Diagnóstico:** MotorcycleE y PianoL tienen otra exposición o iluminación en el ojo derecho
+  por diseño, y en superficies lisas o texturas finas correr 2 px casi no cambia el error.
+- **Comprobación:** con un barrido de −3 a +3 px, todas tenían el mínimo exactamente en 0.
+- **Método nuevo:** census 5×5 en píxeles con textura, mínimo en 0, cociente < 0,95 y al menos
+  10 000 píxeles.
+- **Tests sintéticos:** detecta signo invertido, escala /2, ×100 olvidado y lectura ÷100 de
+  datos guardados ×1024. Tolera un cambio de exposición.
+
+**Evidencia.**
+- `auditar`: 15/15 de MiddEval3 y 27/27 de ETH3D con la GT alineada. Cocientes de 0,33 a 0,59 en
+  MiddEval3 y de 0,27 a 0,87 en ETH3D. Hojas de contacto revisadas a ojo (Adirondack).
+  Resultados en `outputs/datos/` (local).
+- `verificar`: 75 y 135 archivos, 0 problemas.
+- `uv run pytest`: 236 aprobados (17 nuevos de datos). `ruff check` y `ruff format --check`
+  correctos.
+
+**Límites y pendientes.**
+- **InStereo2K no está descargado.** Hace falta bajarlo a mano.
+- Su lector sigue la estructura de torchvision (`train|test/<carpeta>/left.png ...`), no
+  verificada.
+- La agrupación «una carpeta = una escena» es provisoria hasta ver si hay pares consecutivos casi
+  iguales.
+- La escala ÷100 la confirmará la auditoría sobre archivos reales.
+- No se descargaron las 13 escenas adicionales de Middlebury 2014.
+
+**Próximo paso:** Bauty baja InStereo2K. Después: `manifiesto` y `auditar --muestras 50`, revisión
+de la agrupación por escena y PR de T04.
+
 ## 2026-11-13 — Corrección de disparidad implementada y verificada con cinta-s7
 
 **Tarea:** T03. **Persona/agente:** Bauty / Claude Code. **Rama:** `a/T03-offset-disparidad` (local).
