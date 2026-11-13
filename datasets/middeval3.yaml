@@ -1,0 +1,320 @@
+nombre: middeval3
+rol: test público principal
+fuente: https://vision.middlebury.edu/stereo/submit3/
+licencia: Sin licencia declarada en la página; uso académico citando el paper
+cita: Scharstein et al., High-resolution stereo datasets with subpixel-accurate ground truth, GCPR 2014
+descargas:
+- url: https://vision.middlebury.edu/stereo/submit3/zip/MiddEval3-data-H.zip
+  bytes: 109900544
+  sha256: 2fc24f494a1e62066d0519cf86b759f344fc7bf0f49785632b582763fb0770a8
+- url: https://vision.middlebury.edu/stereo/submit3/zip/MiddEval3-GT0-H.zip
+  bytes: 53097428
+  sha256: c6537f6ee9debcf2a2ec605e69950b5feecb3c5df369f313bb22761acf74025c
+descarga_manual: null
+reglas_gt:
+- disparidad en px, d = x_izq - x_der; infinito del PFM = sin GT (NaN en StereoSample)
+- 'máscara: 0 sin GT, 128 ocluido, 255 visible en ambos; métricas noc usan 255'
+- 'metros: Z = fx * baseline / (d + doffs), baseline de calib.txt en mm -> m'
+notas:
+- Solo trainingH tiene GT; testH no se usa.
+- 'Comparadores: no usar pesos entrenados con Middlebury (TECNICO T14).'
+particion:
+  test:
+  - Adirondack
+  - Art
+  - Jadeplant
+  - Motorcycle
+  - Piano
+  - Pipes
+  - Playroom
+  - Playtable
+  - Recycle
+  - Shelves
+  - Teddy
+  - Vintage
+muestras:
+- id: Adirondack
+  escena: Adirondack
+  grupo_oficial: training
+  archivos:
+  - ruta: MiddEval3/trainingH/Adirondack/im0.png
+    bytes: 1864385
+    sha256: 950c84284491d9e17330b16c3e0d6619dc0450a59376f08bdcaa91f74f26a281
+  - ruta: MiddEval3/trainingH/Adirondack/im1.png
+    bytes: 1847024
+    sha256: ee4b36dbfe238e15f0b88c2c3f57d88a161450520dc27a4502bbcb8bb973e418
+  - ruta: MiddEval3/trainingH/Adirondack/disp0GT.pfm
+    bytes: 5698070
+    sha256: 28a5c193a929e62ec90cb8f28525865fc3749f828f56c93656a40e4aa43590d8
+  - ruta: MiddEval3/trainingH/Adirondack/mask0nocc.png
+    bytes: 24078
+    sha256: 79b14d3e5148868656ff634ca843bebf80c641a28ca178e583bfb9eaff282a88
+  - ruta: MiddEval3/trainingH/Adirondack/calib.txt
+    bytes: 218
+    sha256: 7d7c1d11a62b2a511ef5c3724ec09d6efe2c74416880ec223777a7b906c7dcf6
+- id: ArtL
+  escena: Art
+  grupo_oficial: training
+  archivos:
+  - ruta: MiddEval3/trainingH/ArtL/im0.png
+    bytes: 592353
+    sha256: 7c65bf8bd7f2eb74e330fb2c4e21a0290b0c384437720ebf957a456f399eb9c2
+  - ruta: MiddEval3/trainingH/ArtL/im1.png
+    bytes: 600235
+    sha256: 497e3e86bc4296c433194167a3021d8330a5ea331623591347b4a1d44b350aef
+  - ruta: MiddEval3/trainingH/ArtL/disp0GT.pfm
+    bytes: 1537925
+    sha256: 304faf9cb9205bf82bb294db4d5b2d6d28005cd82a6ac1a9b0997b4ebc4cc224
+  - ruta: MiddEval3/trainingH/ArtL/mask0nocc.png
+    bytes: 11957
+    sha256: 4b4689464fea88c7fae34737e7d6a6bbd8f4a6bfa72afed2eea7063ff3b01be4
+  - ruta: MiddEval3/trainingH/ArtL/calib.txt
+    bytes: 169
+    sha256: a50bf6c647926ddacfd974b317547a5baf72d7f440b28b2f603de41fdab43113
+- id: Jadeplant
+  escena: Jadeplant
+  grupo_oficial: training
+  archivos:
+  - ruta: MiddEval3/trainingH/Jadeplant/im0.png
+    bytes: 1931726
+    sha256: a04bc965c5ec4237e10a2994afc4bdb12cd6d898211d7e24da7d72c2682aaa1c
+  - ruta: MiddEval3/trainingH/Jadeplant/im1.png
+    bytes: 1982313
+    sha256: e635f5543219e48ff6d6e0f86912cb506f99188fb876dcf934eeeeb83a0633cd
+  - ruta: MiddEval3/trainingH/Jadeplant/disp0GT.pfm
+    bytes: 5240390
+    sha256: b3be0ab35f84bd3efe78ee0c92884d69b271a58e7c7f8b99b95943ac4786684a
+  - ruta: MiddEval3/trainingH/Jadeplant/mask0nocc.png
+    bytes: 56851
+    sha256: e816a6ad64ab692ed805c76baefda15522055e2b3adccf6fb9a100509ca9616e
+  - ruta: MiddEval3/trainingH/Jadeplant/calib.txt
+    bytes: 218
+    sha256: e273eb0063d79685019efb0d98213ad94fd61e0404f8b1ab140fe314be18cabf
+- id: Motorcycle
+  escena: Motorcycle
+  grupo_oficial: training
+  archivos:
+  - ruta: MiddEval3/trainingH/Motorcycle/im0.png
+    bytes: 2226369
+    sha256: 4dc71a49811cd88911fb63e6ac2fb5e631928e79484007293b1cf5b69d650da2
+  - ruta: MiddEval3/trainingH/Motorcycle/im1.png
+    bytes: 2212192
+    sha256: 2c1db712b1ab5fd38bb376a965d0e0efb2bc61c885fbaf2d885e83f11f5712ff
+  - ruta: MiddEval3/trainingH/Motorcycle/disp0GT.pfm
+    bytes: 5892454
+    sha256: 70a268e238279910edb96a2868ad0673a8958e7173b0af3b8b66e610760ce15f
+  - ruta: MiddEval3/trainingH/Motorcycle/mask0nocc.png
+    bytes: 52654
+    sha256: 6fd3050d92ac2f05625547736742d73eebabe9093497f8a33984bcd5745ab91d
+  - ruta: MiddEval3/trainingH/Motorcycle/calib.txt
+    bytes: 217
+    sha256: 65777989881102d02c79c28c7809c48890e31a917daaafc0abf04ca5863da229
+- id: MotorcycleE
+  escena: Motorcycle
+  grupo_oficial: training
+  archivos:
+  - ruta: MiddEval3/trainingH/MotorcycleE/im0.png
+    bytes: 2226369
+    sha256: 4dc71a49811cd88911fb63e6ac2fb5e631928e79484007293b1cf5b69d650da2
+  - ruta: MiddEval3/trainingH/MotorcycleE/im1.png
+    bytes: 2069330
+    sha256: 51608be851697e0f5b71e4920b0d81df8c0b15def7f4841e80b254723e6d3425
+  - ruta: MiddEval3/trainingH/MotorcycleE/disp0GT.pfm
+    bytes: 5892454
+    sha256: 70a268e238279910edb96a2868ad0673a8958e7173b0af3b8b66e610760ce15f
+  - ruta: MiddEval3/trainingH/MotorcycleE/mask0nocc.png
+    bytes: 52654
+    sha256: 6fd3050d92ac2f05625547736742d73eebabe9093497f8a33984bcd5745ab91d
+  - ruta: MiddEval3/trainingH/MotorcycleE/calib.txt
+    bytes: 217
+    sha256: 65777989881102d02c79c28c7809c48890e31a917daaafc0abf04ca5863da229
+- id: Piano
+  escena: Piano
+  grupo_oficial: training
+  archivos:
+  - ruta: MiddEval3/trainingH/Piano/im0.png
+    bytes: 1847761
+    sha256: 9f02709d63d518395adf22de7eebe913e062ea7d3d227832dfdb4be9549b9a6e
+  - ruta: MiddEval3/trainingH/Piano/im1.png
+    bytes: 1861077
+    sha256: 52687df4bb977b84b01239f1f4ac2d18fa1de25c2422b5f9c3900d772b02ea1e
+  - ruta: MiddEval3/trainingH/Piano/disp0GT.pfm
+    bytes: 5441094
+    sha256: fad48b835ed67d6493c20dc12accb288d9788b71cabf5bbcc8d4e5ce77632e55
+  - ruta: MiddEval3/trainingH/Piano/mask0nocc.png
+    bytes: 38938
+    sha256: dd6ae665572f32ebb223efa5a2348798a2ab95a654462e29a542ec9504a55e94
+  - ruta: MiddEval3/trainingH/Piano/calib.txt
+    bytes: 216
+    sha256: 44aca854548693b0416d404259ddd3f880be959123d3b821e658b78997ffbd15
+- id: PianoL
+  escena: Piano
+  grupo_oficial: training
+  archivos:
+  - ruta: MiddEval3/trainingH/PianoL/im0.png
+    bytes: 1847761
+    sha256: 9f02709d63d518395adf22de7eebe913e062ea7d3d227832dfdb4be9549b9a6e
+  - ruta: MiddEval3/trainingH/PianoL/im1.png
+    bytes: 1872450
+    sha256: 27fa2d3ac6a0a41ca5e94a71919492d423f06decd7759914bdf966af529eba35
+  - ruta: MiddEval3/trainingH/PianoL/disp0GT.pfm
+    bytes: 5441094
+    sha256: fad48b835ed67d6493c20dc12accb288d9788b71cabf5bbcc8d4e5ce77632e55
+  - ruta: MiddEval3/trainingH/PianoL/mask0nocc.png
+    bytes: 38938
+    sha256: dd6ae665572f32ebb223efa5a2348798a2ab95a654462e29a542ec9504a55e94
+  - ruta: MiddEval3/trainingH/PianoL/calib.txt
+    bytes: 216
+    sha256: 44aca854548693b0416d404259ddd3f880be959123d3b821e658b78997ffbd15
+- id: Pipes
+  escena: Pipes
+  grupo_oficial: training
+  archivos:
+  - ruta: MiddEval3/trainingH/Pipes/im0.png
+    bytes: 2136658
+    sha256: a2e876c4134f7eb84217c1af1769455ce2632386e143c8c6a27d8cca26f5bf0d
+  - ruta: MiddEval3/trainingH/Pipes/im1.png
+    bytes: 2177799
+    sha256: dbe0a05f2145f91fe544d387c05a30a29a47490d79289c64e399debfcd5d19a6
+  - ruta: MiddEval3/trainingH/Pipes/disp0GT.pfm
+    bytes: 5703622
+    sha256: a5774ab905e7c2c7a806773c34978c2d1ff0c59ae24528c923561a174b58a622
+  - ruta: MiddEval3/trainingH/Pipes/mask0nocc.png
+    bytes: 44570
+    sha256: c638c29967798652f4ffe89b980eb58497e15051ff72f113fe80ca32a1141755
+  - ruta: MiddEval3/trainingH/Pipes/calib.txt
+    bytes: 217
+    sha256: 8aecc2290a0ca1c3d8e82ed8462bf8fbb4cf307c66a4b02ac942f598020e07b1
+- id: Playroom
+  escena: Playroom
+  grupo_oficial: training
+  archivos:
+  - ruta: MiddEval3/trainingH/Playroom/im0.png
+    bytes: 1840962
+    sha256: 07e18c0f00627064d6c3533aa684fc479977d2755ffe878573901566ff086268
+  - ruta: MiddEval3/trainingH/Playroom/im1.png
+    bytes: 1840871
+    sha256: 5db3d4e3bb867ff01391284fab982d9129d381990f88c5f3a6863e5e31a619e4
+  - ruta: MiddEval3/trainingH/Playroom/disp0GT.pfm
+    bytes: 5323606
+    sha256: fadfe56b06a8eb4c5dc80b07a4c4762d03a984443c50510473b9c757bc12412d
+  - ruta: MiddEval3/trainingH/Playroom/mask0nocc.png
+    bytes: 48380
+    sha256: 82e136963749faf70aa5dfe296a1334ca3d3a74c9a9b023b01bf76c93bede61a
+  - ruta: MiddEval3/trainingH/Playroom/calib.txt
+    bytes: 218
+    sha256: 4af9031484bac86f4c54083dba18a4b8a2389e7e96b8c51f47b7bbce2ccafb90
+- id: Playtable
+  escena: Playtable
+  grupo_oficial: training
+  archivos:
+  - ruta: MiddEval3/trainingH/Playtable/im0.png
+    bytes: 1963814
+    sha256: ec3b3e11ae5e6aa7d9e2457589ba060c985cfe1ea66e1112336bec6ae755a354
+  - ruta: MiddEval3/trainingH/Playtable/im1.png
+    bytes: 1956391
+    sha256: 10c2baa5104ca97f6a47462cd2b3cf4ccc77121d37f64a82c98f1fc14082364d
+  - ruta: MiddEval3/trainingH/Playtable/disp0GT.pfm
+    bytes: 5037462
+    sha256: c8d4c8e5907dd4a5adfcf378c9e4a556e2d633721f78514801130e9d871d5ff8
+  - ruta: MiddEval3/trainingH/Playtable/mask0nocc.png
+    bytes: 36985
+    sha256: 5961b6f11ecad1cbdfb1132f1893f912cd040be52aa2eff4d4fdc69ef168cd75
+  - ruta: MiddEval3/trainingH/Playtable/calib.txt
+    bytes: 216
+    sha256: 599df8d54a0ff818b256f21562a5dfd8c55a02d1fee30ef340a7828feb0c82a4
+- id: PlaytableP
+  escena: Playtable
+  grupo_oficial: training
+  archivos:
+  - ruta: MiddEval3/trainingH/PlaytableP/im0.png
+    bytes: 1968476
+    sha256: 9d0de8110ccceb17afb25b40530fc4000c8775b757dcb8f37b0320611ef75df0
+  - ruta: MiddEval3/trainingH/PlaytableP/im1.png
+    bytes: 1961642
+    sha256: 89813d07042f99d1b30e5d9d8dad3462a0df38fe0982cf82eb6177c6522239f6
+  - ruta: MiddEval3/trainingH/PlaytableP/disp0GT.pfm
+    bytes: 5033974
+    sha256: 17cc9a445c84689b54c103efffba0f6a692c7239dc871955539270025d64202e
+  - ruta: MiddEval3/trainingH/PlaytableP/mask0nocc.png
+    bytes: 36193
+    sha256: 55b26ae679e527eb842458f14790d9105d80e88f193f665e36e86a7b6c2e3652
+  - ruta: MiddEval3/trainingH/PlaytableP/calib.txt
+    bytes: 209
+    sha256: 72b52b31445713df45a6c8e5f01275db4808dbb2e38b2c0ed4a77e1d9fc06535
+- id: Recycle
+  escena: Recycle
+  grupo_oficial: training
+  archivos:
+  - ruta: MiddEval3/trainingH/Recycle/im0.png
+    bytes: 1606001
+    sha256: aa6e407f336adfe1f27ae9923fd7d54711cd86015f7a2d85fb4928133d5b1413
+  - ruta: MiddEval3/trainingH/Recycle/im1.png
+    bytes: 1603948
+    sha256: be717d6343f59954a6e957e434f7fc1119294ed3a3f9802024955fa72fe6d6d0
+  - ruta: MiddEval3/trainingH/Recycle/disp0GT.pfm
+    bytes: 5598742
+    sha256: c88c412d9bac36d6c57298d726e6db309371e4a3e82a2115e7b1fb75aa2d4407
+  - ruta: MiddEval3/trainingH/Recycle/mask0nocc.png
+    bytes: 26649
+    sha256: 26572f5ce41ca68b48eadbf47d1aeb08aff3cfbbfd8c4cc3e9b3df2a0beb8d63
+  - ruta: MiddEval3/trainingH/Recycle/calib.txt
+    bytes: 212
+    sha256: ba9a003c89bf9a405c9ae843080145685b27af1f324ba3776884c4001951ff19
+- id: Shelves
+  escena: Shelves
+  grupo_oficial: training
+  archivos:
+  - ruta: MiddEval3/trainingH/Shelves/im0.png
+    bytes: 1845740
+    sha256: e49d21526911ebfcd26197aed68be9fb1c2b1e2ec62bc886b7c98d379ac897ac
+  - ruta: MiddEval3/trainingH/Shelves/im1.png
+    bytes: 1841925
+    sha256: 8fa8f8e40ac4a780ef2adca9e30b41c558e8147e15baec8c9e8fef20767acfcd
+  - ruta: MiddEval3/trainingH/Shelves/disp0GT.pfm
+    bytes: 5868598
+    sha256: 2f4eb5e85632a62ee317ce6f5b7a9762436c997bd9ef3d07e8c51e77b3a10864
+  - ruta: MiddEval3/trainingH/Shelves/mask0nocc.png
+    bytes: 37011
+    sha256: 250d8eb4a7263ffa1e793f1efca3b9bab9b349d2426d1c972cc733a7aaf0f3ab
+  - ruta: MiddEval3/trainingH/Shelves/calib.txt
+    bytes: 205
+    sha256: ebdf0f218d37a4e5941231b82f393001793a90414c0f975dfaf4ef96b9c9d107
+- id: Teddy
+  escena: Teddy
+  grupo_oficial: training
+  archivos:
+  - ruta: MiddEval3/trainingH/Teddy/im0.png
+    bytes: 1175349
+    sha256: 0d7e1c31be4e7a108be3c30d9e28232ace4c6103720d6244f987eccda5f15ed6
+  - ruta: MiddEval3/trainingH/Teddy/im1.png
+    bytes: 1166918
+    sha256: 99010a2054a9d78b068f456eedc3fa6a89b43731a72203f1c9923446e5a153fe
+  - ruta: MiddEval3/trainingH/Teddy/disp0GT.pfm
+    bytes: 2700021
+    sha256: e7e71d1ea9fdda28fef6e4663d45c9f0969e4df44ee34db4d120bcfc4f134568
+  - ruta: MiddEval3/trainingH/Teddy/mask0nocc.png
+    bytes: 15676
+    sha256: 0a84eed85cf03e0549ad0e42393795efbd07f0b3885ed08442ca4fe121bbb22c
+  - ruta: MiddEval3/trainingH/Teddy/calib.txt
+    bytes: 168
+    sha256: e44c2752099ddd0657b32f7e3265d27285c0f776579071b05b85cb8097324d1d
+- id: Vintage
+  escena: Vintage
+  grupo_oficial: training
+  archivos:
+  - ruta: MiddEval3/trainingH/Vintage/im0.png
+    bytes: 1794123
+    sha256: 43b02813adbe9782578d4ff49246cb5a2a1420b932d586725eb433f9e01aae8c
+  - ruta: MiddEval3/trainingH/Vintage/im1.png
+    bytes: 1677764
+    sha256: 16779dc6df3ce0f832ee64765df464dbce5987f1344aa6f51e9546bfe8baaf48
+  - ruta: MiddEval3/trainingH/Vintage/disp0GT.pfm
+    bytes: 5544982
+    sha256: 21e1c8cdf18a310ac330ae947d386ad365b54c39699c82a5ffa04bb5c118b535
+  - ruta: MiddEval3/trainingH/Vintage/mask0nocc.png
+    bytes: 32262
+    sha256: 89a0fc395483b2910827a6781407507bbd88d24b03ed15bb9e6fcd07b8c3a5ac
+  - ruta: MiddEval3/trainingH/Vintage/calib.txt
+    bytes: 217
+    sha256: aa239903129de382272892ca6ad34aab93346dd65ad91ebdda4158de3de6e075
