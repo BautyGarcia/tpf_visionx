@@ -73,9 +73,34 @@ exposición ni la robustez al movimiento; incluir objetos/cámara en movimiento 
 y tiempo original, y distinguir el tiempo de reproducción. Permite que Bauty y los agentes
 trabajen sobre el mismo material sin tener físicamente la ELP.
 
-Una grabación futura tendrá manifiesto con versión, sesión, frames, pares/rutas relativas,
-hashes, tiempos originales, modo y calibración. Preservar el original comprimido si el backend
-lo permite; no asumir que OpenCV entrega MJPEG sin decodificar. Evitar recompresiones repetidas.
+Preservar el original comprimido si el backend lo permite; no asumir que OpenCV entrega MJPEG
+sin decodificar. Evitar recompresiones repetidas.
+
+**Implementación (`src/visionx/camera/`, BITACORA 2026-11-13).** Tres fuentes con la misma
+interfaz `FrameSource`, intercambiables por configuración:
+
+| Pieza | Qué hace | Si falla |
+|---|---|---|
+| `UsbStereoSource` | Abre la ELP (fourcc antes que tamaño), descarta cuadros de arranque, separa el SBS y numera los pares | Tamaño distinto del pedido, cámara que no abre o que no vuelve tras `reconnect_attempts`: `SourceError`. Nunca `None` |
+| `Recorder` | Escribe los dos ojos (archivo temporal y renombre) y recién después la línea del par en `frames.jsonl`. Con cola, un hilo escribe y los pares que no entran se descartan y quedan contados | Sesión, tamaño o geometría distinta del primer par, o `frame_id` que no avanza: error |
+| `ReplaySource` | Devuelve la misma identidad, `replay_original_ns` = recepción original y `received_ns` del reloj de reproducción (ManualClock, tiempo real o lo más rápido posible) | Archivo faltante, SHA-256 distinto o índice roto: `SourceError`. Fin normal: `None` |
+| `RectifiedSource` | Envuelve cualquiera de las anteriores y rectifica con `StereoCalibration` (incluye la corrección de disparidad) | Par de otro tamaño que la calibración o ya rectificado: `InvalidInput` |
+
+Grabación en disco: `manifest.yaml` (`visionx-grabacion` versión 1: sesión, fuente, tamaño
+del ojo, formato de imagen, equipo, cámara pedida, calibración configurada, estado
+`grabando`/`cerrada`/`con_error`, pares, descartados y resumen de tiempos), `frames.jsonl` y
+`frames/NNNNNN_L|R.jpg|png`. Se graba el par **sin rectificar**, para poder rectificar después
+con otra calibración. JPEG 95 por defecto; PNG cuando el contenido exacto importa. Si el índice
+termina en una línea a medio escribir, el replay la ignora y lo avisa.
+
+Comandos (en Windows con Smart App Control usar `python -m`, ver README):
+
+```text
+uv run python -m visionx.camera ver            # tapar un lente: comprobar que no estén invertidos
+uv run python -m visionx.camera modos          # modos entregados y FPS medidos
+uv run python -m visionx.camera grabar recordings/escena --segundos 600 [--formato png]
+uv run python -m visionx.camera verificar recordings/escena
+```
 
 ### Calibrar y rectificar — T03
 

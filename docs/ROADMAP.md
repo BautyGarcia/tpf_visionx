@@ -163,7 +163,7 @@ si hay código integrado pero falta recepción, escribir ambos hechos sin oculta
 | ID | Capacidad | Integra | Estado al 02/11 | Reserva activa |
 |---|---|---|---|---|
 | T01 | Base reproducible, contratos y artefactos | A+B | Parcial: base publicada; recepción/almacén y utilidades pendientes | Ninguna |
-| T02 | Captura USB, grabación y replay | B | Pendiente; modos ELP y 10/30 min medidos en Mac (BITACORA 2026-11-12, `scripts/calibracion/modos.py`), falta Windows | Ninguna |
+| T02 | Captura USB, grabación y replay | B | En curso: captura, grabación, replay y rectificación implementados con tests sin cámara (BITACORA 2026-11-13); modos ELP medidos en Mac (2026-11-12); falta ELP en Windows: `ver`, `modos` y grabación de 10 min (M2) | Tomás / Claude Code, rama `b/T02-captura`, `src/visionx/camera/`, `tests/test_camera.py`, sección `camera` de `configs/default.yaml`; sin cámara (fakes) |
 | T03 | Calibración y validación física | B con evaluación A | Hecha: calibración s6 (PR #13) + corrección de disparidad 0,5275 px verificada con cinta 1–3 m (control 1,5 m: −5 mm), `configs/calib/elp-2026-11-11-corregida.yaml` (BITACORA 2026-11-13). Estabilidad de δ entre días asumida, no medida | Ninguna |
 | T04 | Datos, GT, particiones y protocolo | A con capturas B | En curso: protocolo decidido; MiddEval3-H, ETH3D e InStereo2K (1221 de 2050 pares: part1/5/6 no disponibles) descargados, auditados y con manifiesto; partición por tramos (BITACORA 2026-11-13) | Bauty / Claude Code, rama `a/T04-datos`, `src/visionx/depth/datasets/`, `datasets/`, `data/` local |
 | T05 | Estéreo, monocular, alineación y B0–B4 | A | Pendiente | Ninguna |
