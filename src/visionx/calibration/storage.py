@@ -7,10 +7,17 @@ milímetros: `from_i308_pickle` convierte.
 
 `calibration_id` se calcula del contenido numérico. Si algo cambia, cambia el id: un
 frame rectificado con una calibración no se puede mezclar con otra sin que se note.
+
+Corrección de disparidad (versión 2 del archivo, BITACORA 2026-11-12/13): con la cámara
+caliente, la ELP mide la disparidad ~0,5 px menor que la real, y eso infla los metros
+(+3 % a 1 m, +5 % a 3 m). `disparity_offset_px` guarda ese corrimiento, ajustado con cinta
+métrica, junto con su procedencia. No toca la rectificación: se suma a doffs al pasar de
+disparidad a metros, porque físicamente es un corrimiento horizontal de un ojo respecto del otro.
 """
 
 from __future__ import annotations
 
+import dataclasses
 import hashlib
 import math
 import pickle
@@ -28,7 +35,8 @@ from visionx.shared.errors import InvalidInput
 from visionx.shared.geometry import StereoGeometry
 
 FORMAT = "visionx-calibracion-estereo"
-FORMAT_VERSION = 1
+FORMAT_VERSION = 2  # 2 agrega correccion_disparidad; la 1 se sigue leyendo (sin corrección)
+READABLE_VERSIONS = (1, 2)
 
 
 @dataclass(frozen=True)
@@ -42,6 +50,9 @@ class StereoCalibration:
     rect: Rectification
     alpha: float
     info: dict[str, Any] = field(default_factory=dict)  # tablero, métricas, fotos, versión
+    # d_real = d_medida + disparity_offset_px, en píxeles de image_size (ver docstring).
+    disparity_offset_px: float = 0.0
+    disparity_offset_source: dict[str, Any] = field(default_factory=dict)  # cómo se midió
     calibration_id: str = field(init=False)
 
     def __post_init__(self) -> None:
@@ -51,6 +62,10 @@ class StereoCalibration:
         for name, value in self._arrays().items():
             if not np.isfinite(value).all():
                 raise InvalidInput(f"{name} tiene valores no finitos")
+        if not isinstance(self.disparity_offset_px, (int, float)) or not math.isfinite(
+            self.disparity_offset_px
+        ):
+            raise InvalidInput("disparity_offset_px tiene que ser un número finito")
         if self.T.ravel()[0] >= 0:
             raise InvalidInput("T_x tiene que ser negativo: el ojo derecho está a la derecha")
         object.__setattr__(self, "calibration_id", self._make_id())
@@ -68,6 +83,9 @@ class StereoCalibration:
         for name, value in self._arrays().items():
             digest.update(name.encode())
             digest.update(np.ascontiguousarray(value, np.float64).tobytes())
+        # Solo entra si existe: así las calibraciones sin corrección conservan su id de siempre.
+        if self.disparity_offset_px != 0.0:
+            digest.update(f"disparity_offset_px|{float(self.disparity_offset_px).hex()}".encode())
         w, h = self.image_size
         return f"elp-{w}x{h}-{self.model.value}-{digest.hexdigest()[:10]}"
 
@@ -77,10 +95,24 @@ class StereoCalibration:
     def baseline_m(self) -> float:
         return float(np.linalg.norm(self.T))
 
-    def geometry(self) -> StereoGeometry:
-        """Geometría del par rectificado, a la resolución de la foto original."""
+    def geometry(self, *, disparity_offset: bool = True) -> StereoGeometry:
+        """Geometría del par rectificado, a la resolución de la foto original.
+
+        Con `disparity_offset` (lo normal), doffs incluye la corrección medida:
+        Z = fx * B / (d + doffs + offset). `False` solo sirve para comparar contra la
+        calibración sin corregir.
+        """
         w, h = self.image_size
-        return StereoGeometry.from_projections(self.rect.P1, self.rect.P2, w, h)
+        g = StereoGeometry.from_projections(self.rect.P1, self.rect.P2, w, h)
+        if not disparity_offset or self.disparity_offset_px == 0.0:
+            return g
+        return dataclasses.replace(g, doffs=g.doffs + float(self.disparity_offset_px))
+
+    def with_disparity_offset(self, offset_px: float, source: dict[str, Any]) -> StereoCalibration:
+        """La misma calibración con una corrección de disparidad (y por lo tanto otro id)."""
+        return dataclasses.replace(
+            self, disparity_offset_px=offset_px, disparity_offset_source=dict(source)
+        )
 
     def rectify_maps(self) -> tuple[tuple[np.ndarray, np.ndarray], tuple[np.ndarray, np.ndarray]]:
         """Mapas de cv2.remap para (izquierdo, derecho). Calcularlos una vez y reutilizar."""
@@ -133,6 +165,11 @@ class StereoCalibration:
                 "roi_izquierda": list(self.rect.roi1),
                 "roi_derecha": list(self.rect.roi2),
             },
+            "correccion_disparidad": {
+                "offset_px": float(self.disparity_offset_px),
+                "convencion": "d_real = d_medida + offset_px; se suma a doffs al pasar a metros",
+                "procedencia": self.disparity_offset_source,
+            },
             "info": self.info,
         }
 
@@ -148,8 +185,10 @@ class StereoCalibration:
         data = yaml.safe_load(Path(path).read_text(encoding="utf-8"))
         if not isinstance(data, dict) or data.get("formato") != FORMAT:
             raise InvalidInput(f"{path}: no es un archivo de calibración VisionX")
-        if data.get("version") != FORMAT_VERSION:
+        if data.get("version") not in READABLE_VERSIONS:
             raise InvalidInput(f"{path}: versión {data.get('version')} no soportada")
+        # Versión 1: no existía la corrección, equivale a offset 0.
+        offset = (data.get("correccion_disparidad") or {}) if data["version"] >= 2 else {}
         rect = data["rectificacion"]
         arr = lambda v: np.asarray(v, np.float64)  # noqa: E731
         calib = cls(
@@ -172,6 +211,8 @@ class StereoCalibration:
             ),  # fmt: skip
             alpha=float(data["alpha"]),
             info=data.get("info") or {},
+            disparity_offset_px=float(offset.get("offset_px", 0.0)),
+            disparity_offset_source=offset.get("procedencia") or {},
         )
         if calib.calibration_id != data.get("calibration_id"):
             raise InvalidInput(f"{path}: el contenido no coincide con su calibration_id")

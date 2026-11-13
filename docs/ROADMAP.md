@@ -61,9 +61,8 @@ Los ejemplos de fakes dentro de tests no constituyen esos módulos terminados.
 El intento local adelantado por Codex no se incorpora: fue detenido por Tomás al aclarar
 que el pedido era planificación. No cuenta como avance aceptado.
 
-Faltan confirmar con la cátedra la aprobación administrativa del equipo/tema y el formato
-definitivo. Se conserva como propuesta informe total de hasta ocho páginas y póster vertical
-A0/A1; no se presenta esa aprobación como obtenida.
+La cátedra aprobó el equipo, el tema y el formato (informado por Bauty, BITACORA 2026-11-13).
+Formato de trabajo: informe total de hasta ocho páginas y póster vertical A0/A1.
 
 ## Recorrido y decisiones
 
@@ -165,8 +164,8 @@ si hay código integrado pero falta recepción, escribir ambos hechos sin oculta
 |---|---|---|---|---|
 | T01 | Base reproducible, contratos y artefactos | A+B | Parcial: base publicada; recepción/almacén y utilidades pendientes | Ninguna |
 | T02 | Captura USB, grabación y replay | B | Pendiente; modos ELP y 10/30 min medidos en Mac (BITACORA 2026-11-12, `scripts/calibracion/modos.py`), falta Windows | Ninguna |
-| T03 | Calibración y validación física | B con evaluación A | En curso: calibración s6 (`configs/calib/elp-2026-11-11.yaml`); cinta 1–3 m hecha: +3 a +5 % por corrimiento de disparidad ~0,5 px, corregible a < 0,5 %; decidir si se acepta esa corrección (BITACORA 2026-11-12) | Bauty+Tomás, rama `a/T03-calibrador`, `src/visionx/calibration/`, `scripts/calibracion/`, ELP en Mac de Bauty |
-| T04 | Datos, GT, particiones y protocolo | A con capturas B | Pendiente | Ninguna |
+| T03 | Calibración y validación física | B con evaluación A | Hecha: calibración s6 (PR #13) + corrección de disparidad 0,5275 px verificada con cinta 1–3 m (control 1,5 m: −5 mm), `configs/calib/elp-2026-11-11-corregida.yaml` (BITACORA 2026-11-13). Estabilidad de δ entre días asumida, no medida | Ninguna |
+| T04 | Datos, GT, particiones y protocolo | A con capturas B | Pendiente; banco ELP, test público y métricas principales decididos (BITACORA 2026-11-13) | Ninguna |
 | T05 | Estéreo, monocular, alineación y B0–B4 | A | Pendiente | Ninguna |
 | T06 | Detección, máscaras y seguimiento | B | Pendiente | Ninguna |
 | T07 | Ejecución interactiva/científica y dashboard | B | Pendiente | Ninguna |

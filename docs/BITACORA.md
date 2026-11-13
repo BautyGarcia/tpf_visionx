@@ -40,6 +40,115 @@ En documentación puede escribirse «sin pruebas de software ni mediciones; revi
 y diff». En una medición real, conservar CSV/JSONL/artefacto verificable; un texto sin datos
 no reemplaza la evidencia. No pegar secretos, pesos ni videos en esta bitácora.
 
+## 2026-11-13 — Corrección de disparidad implementada y verificada con cinta-s7
+
+**Tarea:** T03. **Persona/agente:** Bauty / Claude Code. **Rama:** `a/T03-offset-disparidad` (local).
+
+**Hecho.**
+- **Formato de la calibración:** `StereoCalibration` agrega `disparity_offset_px` y su
+  procedencia. El archivo pasa a la versión 2, que suma la sección `correccion_disparidad`; la
+  versión 1 se sigue leyendo, sin corrección y con el mismo id.
+- **Conversión a metros:** `geometry()` suma la corrección a doffs, de modo que todo lo que pasa
+  de disparidad a metros la usa. `geometry(disparity_offset=False)` da la geometría sin corregir.
+- **Id de la calibración:** la corrección entra en `calibration_id` solo si no es cero. Las
+  calibraciones viejas conservan su id; la corregida tiene otro.
+- **Script nuevo `scripts/calibracion/offset_cinta.py`:** reajusta δ y el cero de la cinta c con
+  los pares guardados y verifica el resultado por el camino real, `calib.geometry()`. El ajuste
+  del 12/11 se había hecho en el scratchpad del agente y no quedaba en el repo.
+- **Archivos:** `configs/calib/elp-2026-11-11-corregida.yaml` (s6 más la corrección) y
+  `configs/default.yaml` apuntando a él. El archivo del 11/11 queda como registro.
+
+**Evidencia.** `offset_cinta.py` sobre `cinta-s7` (5 distancias, 3 pares cada una, Mac arm64,
+OpenCV 5.0.0). Ajuste con 1/2/2,5/3 m; control con 1,5 m.
+- **δ = 0,5275 px y c = 12,9 mm.** El 12/11 había dado 0,525 px y 14 mm con otra implementación.
+  La diferencia equivale a 0,6 mm a 3 m.
+- **Error contra la cinta, ya sumado c:**
+
+  | Distancia | Uso | Sin corregir | Corregido |
+  |---|---|---|---|
+  | 1 m | ajuste | +16,7 mm | +1,5 mm |
+  | 2 m | ajuste | +58,8 mm | −2,3 mm |
+  | 2,5 m | ajuste | +95,8 mm | −0,3 mm |
+  | 3 m | ajuste | +140,4 mm | +1,0 mm |
+  | 1,5 m | **control** | +28,8 mm | **−5,0 mm (0,3 %)** |
+
+- **Software:** `uv run pytest`: 219 aprobados, 3 tests nuevos de corrección, ida y vuelta,
+  manipulación del archivo y versión 1. `ruff check` y `ruff format --check` correctos.
+  `visionx doctor` correcto.
+
+**Límites.**
+- El ajuste y la verificación usan la misma sesión; solo 1,5 m es control independiente.
+- No se mide la estabilidad de δ entre días. Por decisión del 13/11 se asume estable con la
+  cámara caliente.
+- c pertenece al montaje y no a la cámara: no se aplica a Z, sirve para medir la GT con cinta.
+- Ningún módulo de profundidad (T05) consume todavía la calibración.
+
+**Estado:** T03 se marca como hecha en ROADMAP dentro del PR que publica este cambio. Si el PR
+no se integra, no está hecha.
+
+**Próximo paso:** T04, descargar y auditar InStereo2K y Middlebury.
+
+## 2026-11-13 — Decisiones: cómputo para Fusion/comparadores y protocolo del banco ELP
+
+**Tareas:** T04, T12, T14. **Persona/agente:** Bauty / Claude Code. **Rama:** `a/T03-offset-disparidad`.
+
+**Investigación previa.** Tres subagentes revisaron opciones de GPU gratuitas/educativas, proveedores
+pagos y requisitos de los cuatro comparadores. Leyeron páginas oficiales, READMEs y papers; no
+se instaló ni ejecutó nada. Hallazgos que pesan:
+- Ninguno de los cuatro comparadores documenta CPU ni MPS.
+- Los programas de créditos grandes piden ser docente o de posgrado.
+- Para un presupuesto chico, el proveedor pago más conveniente es RunPod.
+- MonSter y DEFOM publican pesos entrenados con Middlebury, ETH3D o InStereo2K.
+Las precisiones quedan en TECNICO, secciones T14 y cómputo.
+
+**Decisiones (Bauty).**
+- **Cómputo:** Fusion se entrena primero en la Mac y Kaggle o un proveedor pago quedan de
+  respaldo. Los comparadores corren en RunPod con RTX 4090 y un tope de USD 30.
+- **Métricas principales:** en Middlebury, AbsRel y bad-2; en la ELP, el % de puntos con error
+  ≤ 5 % más la mediana y el P90. Siempre con cobertura. Fusion contra B4 a igual cobertura define
+  el resultado. Quedan fijadas en TECNICO antes de entrenar.
+- **Protocolo ELP:** el agente propuso y Bauty delegó la decisión. 40 escenas en 5 sesiones;
+  2 sesiones de desarrollo y 3 de test, reservado por hash. Las escenas ELP no entrenan Fusion.
+  La GT principal son puntos con stickers medidos con cinta como profundidad axial. El damero es
+  secundario y el LiDAR del iPhone 16 Pro es solo exploratorio.
+- **Test público:** Middlebury 2014 es el principal y ETH3D, que está en escala de grises, es
+  secundario.
+- **Motivos:** la cinta (±1 cm) es mucho más precisa que el error esperado del estéreo a 3 m
+  (~25 cm por píxel). El iPhone agrega error propio y exige alinear sus datos con la ELP.
+
+**Evidencia:** fuentes enlazadas por los subagentes en la conversación. Sin mediciones ni pruebas
+de software. Tiempos de Mac, VRAM reales e instalación de cada comparador: no medidos.
+
+**Próximo paso:**
+- Implementar `disparity_offset_px`; hecho, ver la entrada siguiente.
+- Empezar T04 descargando y auditando InStereo2K y Middlebury.
+- Grabar el banco ELP una vez que T05 permita revisar la cobertura de cada escena.
+
+## 2026-11-13 — Decisiones: corrección de disparidad aceptada y aprobación de la cátedra
+
+**Tareas:** T03, T16. **Persona/agente:** Bauty / Claude Code. **Rama:** `a/T03-offset-disparidad`.
+
+**Decisión 1 (T03).** Se acepta la opción A de la entrada del 12/11: el corrimiento de
+disparidad `disparity_offset_px` = 0,525 px, ajustado con cinta a 1/2/2,5/3 m y validado con
+1,5 m (−5,9 mm tras corregir), pasa a ser un parámetro de la calibración, con procedimiento y
+procedencia registrados. No se considera una corrección manual de metros.
+**Motivo:** reduce el error de +3 a +5 % a menos de 0,5 % entre 1 y 3 m; recalibrar antes de
+cada medición no lo evita si el corrimiento vuelve a aparecer.
+**Cambio respecto del 12/11:** no se repite la cinta en otros días para comprobar si δ es estable.
+Se asume estable con la cámara caliente. **Límite que queda:** la estabilidad entre días de δ no
+está medida. El informe debe decirlo así y no presentarla como comprobada.
+
+**Decisión 2 (T16).** Bauty informa que la cátedra aprobó el equipo, el tema y el formato.
+Reemplaza lo que decía ROADMAP: «faltan confirmar con la cátedra». No se agregó como evidencia
+un documento de la cátedra.
+
+**Evidencia:** decisiones de la persona. Sin pruebas de software ni mediciones en esta entrada.
+
+**Próximo paso:** implementar `disparity_offset_px` en el YAML de calibración y en la conversión
+de disparidad a profundidad, con tests sintéticos, y volver a correr las 5 mediciones de
+`cinta-s7` como verificación. En paralelo se investigan las opciones de GPU (T12/T14) y se
+discute el protocolo de datos (T04).
+
 ## 2026-11-12 — Modos de la ELP, control entre días y cinta de 1 a 3 m
 
 **Tarea:** T03 (y medición de hardware para T02). **Personas/agente:** Bauty / Claude Code.

@@ -104,6 +104,21 @@ Reportar reproyección y error vertical, pero validar escala con distancia físi
 El plano del tablero calculado desde la misma calibración no es una referencia independiente
 para demostrar su propia escala. No aplicar un factor manual para que coincidan los metros.
 
+**Corrección de disparidad (aceptada el 13/11).** Con la cámara caliente, la ELP mide la
+disparidad δ px menor que la real. El error en metros crece con la distancia (+3 % a 1 m, +5 % a
+3 m). Eso es la firma de un corrimiento fijo y no de un error de escala, así que un factor sobre
+los metros no lo corregiría.
+- **Dónde se guarda:** δ se ajusta con cinta y queda en el YAML de calibración
+  (`correccion_disparidad`, versión 2 del archivo). Lleva su procedencia y una distancia de control
+  que no entra en el ajuste.
+- **Cómo se aplica:** `calib.geometry()` lo suma a doffs, así que todo lo que pasa de disparidad a
+  metros lo usa sin código adicional. `geometry(disparity_offset=False)` solo sirve para comparar.
+- **Valor actual:** `configs/calib/elp-2026-11-11-corregida.yaml`, δ = 0,5275 px a 1920×1080
+  por ojo.
+- **Para volver a medirlo:** `scripts/calibracion/cinta.py` y después
+  `scripts/calibracion/offset_cinta.py`.
+- **Límite:** no se mide si δ es estable entre días; se asume.
+
 El núcleo publicado soporta proyecciones canónicas horizontales con origen en el ojo izquierdo
 y baseline positivo. No interpreta estéreo vertical/invertido como horizontal. Si la lente real
 exige otro modelo, comparar calibraciones sobre validación y planificar compatibilidad explícita;
@@ -503,10 +518,34 @@ No anunciar conteos definitivos copiados de propuestas: verificarlos en el manif
 En Middlebury leer focal/baseline/doffs/unidades de su calibración; no suponer centros iguales.
 [Convenciones de Middlebury](https://vision.middlebury.edu/stereo/data/scenes2014/).
 
-Banco ELP: capturar 30–50 escenas variadas con GT delimitado; entrenamiento/desarrollo/test
-por sesiones. Reservar el test cuando la geometría esté fijada, sin esperar a que toda la app
-esté lista. Una cinta mide puntos/superficies concretas; un tablero da plano donde está el tablero,
-no GT denso del fondo. Separar ROI manual, máscara predicha y superficie realmente referenciada.
+**Test público (decidido 13/11).** Middlebury 2014 es el principal. ETH3D two-view es
+secundario: sus imágenes están en escala de grises y DA V2/Fusion trabajan en color. Se replica
+el canal y se informa como limitación.
+
+**Banco ELP (decidido 13/11).** 40 escenas en 5 sesiones de 8, en lugares, días o iluminación
+distintos. Se divide **por sesión**: 2 sesiones de desarrollo (≈16 escenas: umbrales, política y
+abstención) y 3 de test (≈24 escenas). El test se graba, se registra su hash y no se miran
+resultados sobre él hasta la evaluación final. Las escenas ELP **no entrenan Fusion**, porque no
+tienen GT densa. Las grabaciones sin GT para pseudoetiquetas de T17 son sesiones aparte.
+Cada escena cubre 0,5–3 m (el rango validado en T03) y mezcla superficies con y sin textura,
+reflejos y objetos de clases de la app. Sin personas.
+
+**GT de la ELP.**
+- **Principal.** 6–8 puntos por escena marcados con stickers chicos (~1 cm), para no regalarle
+  textura al estéreo. Se mide la profundidad axial con cinta: la distancia perpendicular desde
+  una línea del piso alineada con el plano de las lentes hasta la vertical del punto. La cámara
+  va nivelada y su inclinación se verifica con el damero. Cada punto se ubica a mano en la imagen
+  izquierda rectificada y se evalúa en una ventana chica alrededor. Se espera una precisión de
+  ±1 cm: con fx ≈ 601 px y B ≈ 60 mm, 1 px de disparidad a 3 m equivale a ~25 cm (`Z²/(fx·B)`).
+  El centro óptico queda ~13 mm detrás del vidrio de la lente (ajuste del 13/11). Si la línea de
+  referencia se apoya en el vidrio, sumar 13 mm a la lectura de la cinta.
+- **Secundaria.** 1–2 escenas por sesión con el damero, para evaluar densidad sobre ese plano.
+- **Exploratoria.** El LiDAR del iPhone 16 Pro sirve como referencia densa aproximada, pero no
+  es GT: tiene baja resolución, error propio y hay que alinearlo con la ELP. No entra en las
+  métricas principales.
+
+Una cinta mide puntos/superficies concretas; un tablero da plano donde está el tablero, no GT
+denso del fondo. Separar ROI manual, máscara predicha y superficie realmente referenciada.
 
 Usar aumentos que simulen compresión/iluminación de ELP si la validación muestra utilidad;
 guardar parámetros y comparar sin ese aumento. No deformar geometría, GT o máscaras por separado.
@@ -528,6 +567,17 @@ Separar **comparación de calidad** (mismos pares/GT) y **comparación de despli
 hardware/condiciones para tiempos). No afirmar un speedup entre Mac y NVIDIA. Los preentrenados
 tienen historias de datos distintas: auditar solapamientos conocidos y declarar lo desconocido.
 Sin información suficiente, no afirmar que una prueba es completamente libre de solapamiento.
+
+**Pesos a usar (investigación del 13/11, leyendo los repositorios; nada se ejecutó).**
+- **MonSter y DEFOM:** usar los checkpoints entrenados solo con SceneFlow. `mix_all` y los
+  afinados incluyen Middlebury, ETH3D o InStereo2K. El README de MonSter avisa un error en
+  `sceneflow.pth`, pendiente de que lo vuelvan a subir.
+- **FoundationStereo:** el modelo base no usa Middlebury ni ETH3D, pero hay una variante afinada
+  con ETH3D. Confirmar a cuál corresponde cada checkpoint publicado.
+- **FoundationStereo y Fast-FoundationStereo** entrenan con InStereo2K. Para nosotros InStereo2K
+  es solo train/val; declararlo en el informe.
+- **Licencias:** MonSter y FoundationStereo permiten solo uso no comercial/académico.
+- **Hardware:** ninguno de los cuatro documenta CPU ni MPS. Se ejecutan en GPU NVIDIA.
 
 ### Ablaciones y evaluación final — T12/T15
 
@@ -687,6 +737,16 @@ orden y cancelación durante OCR/inferencia/TTS. Los fakes no validan precisión
 - **Recall de cancelar:** qué fracción de órdenes de cancelar reconoció; informar además
   cancelación física y si efectivamente se cortó el sonido.
 
+**Métricas principales de profundidad (fijadas el 13/11, antes de entrenar):**
+- **Middlebury 2014:** AbsRel = |Z−Z_GT|/Z_GT y bad-2, sobre los píxeles con GT válida.
+- **Banco ELP:** porcentaje de puntos con error relativo ≤ 5 %, más la mediana y el P90 del error
+  relativo.
+- **Siempre:** cobertura, es decir la fracción con respuesta, junto al error.
+- **Comparación que define el resultado:** Fusion contra B4 con esas dos métricas, a igual
+  cobertura.
+- **Para T13:** AUSE y riesgo-cobertura.
+- No cambiar esta elección después de ver resultados de validación o test.
+
 No mezclar GT válido y predicción válida. Un fallo tiene cobertura/fallo explícitos, no EPE cero.
 IC95%, intervalo estadístico de comparación, por bootstrap de escenas/grupos; no remuestrear
 millones de píxeles correlacionados como si fueran independientes. Las 90 medidas se agrupan por
@@ -724,6 +784,16 @@ con Python/dependencias diferentes; no forzarlas en el entorno base de la aplica
 Créditos disponibles no confirman GPU ni autorizan gasto ilimitado: fijar presupuesto/coste
 y tiempo máximo antes de corridas, apagar recursos y registrar consumo. No llevar el bucle
 de interacción a nube por rutina.
+
+**Decisión del 13/11.**
+- **Fusion:** se entrena primero en la Mac (MPS), con overfit y un piloto que mida el tiempo por
+  época. Si las semillas y ablaciones no entran en el calendario, pasar a Kaggle (2×T4,
+  ~30 h/semana, checkpoints frecuentes) o a un proveedor pago.
+- **Comparadores:** RunPod, RTX 4090 de 24 GB (≈USD 0,34/h en Community, cobro por segundo), con
+  un entorno por modelo. Tope de USD 30 cargado por adelantado.
+- **Por qué no T4 para FoundationStereo:** midió 10,5 GB a media resolución de Middlebury y usa
+  flash-attn, que probablemente no soporta esa generación de GPU. Está sin verificar.
+- Registrar horas y gasto de cada corrida.
 
 ### Artefactos compartidos
 
