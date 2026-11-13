@@ -246,6 +246,60 @@ def test_save_load_roundtrip_and_geometry(run_clean, tmp_path):
     assert geometry.depth_at(geometry.fx * geometry.baseline_m / 1.0) == pytest.approx(1.0)
 
 
+# --- Corrección de disparidad (BITACORA 2026-11-12/13) ---------------------------------
+
+
+def test_disparity_offset_corrects_depth(run_clean):
+    """La cámara mide d - δ: la geometría corregida devuelve la Z real, también reescalada."""
+    run, options, sessions = run_clean
+    calib = to_calibration(run, sessions, options)
+    fixed = calib.with_disparity_offset(0.5, {"metodo": "test"})
+    base, g = calib.geometry(), fixed.geometry()
+    assert g.doffs == pytest.approx(base.doffs + 0.5)
+    measured = g.fx * g.baseline_m / 2.0 - 0.5  # disparidad medida de un punto a 2 m
+    assert g.depth_at(measured) == pytest.approx(2.0)
+    assert base.depth_at(measured) > 2.0  # sin corregir, sobreestima como la ELP
+    # La corrección está en píxeles de la resolución calibrada y escala con ella.
+    half = g.resized(960, 540)
+    assert half.depth_at(measured / 2) == pytest.approx(2.0)
+    # Pedir la geometría sin corrección reproduce la original.
+    assert fixed.geometry(disparity_offset=False).geometry_id == base.geometry_id
+
+
+def test_disparity_offset_changes_id_and_roundtrips(run_clean, tmp_path):
+    run, options, sessions = run_clean
+    calib = to_calibration(run, sessions, options)
+    fixed = calib.with_disparity_offset(0.525, {"cinta": "cinta-s7"})
+    assert fixed.calibration_id != calib.calibration_id
+    # Con offset 0 el id no cambia: los archivos viejos siguen siendo los mismos.
+    assert calib.with_disparity_offset(0.0, {}).calibration_id == calib.calibration_id
+    loaded = StereoCalibration.load(fixed.save(tmp_path / "elp.yaml"))
+    assert loaded.calibration_id == fixed.calibration_id
+    assert loaded.disparity_offset_px == 0.525
+    assert loaded.disparity_offset_source == {"cinta": "cinta-s7"}
+    # Cambiar el offset en el archivo sin recalcular el id se detecta.
+    data = yaml.safe_load((tmp_path / "elp.yaml").read_text(encoding="utf-8"))
+    data["correccion_disparidad"]["offset_px"] = 0.6
+    (tmp_path / "elp.yaml").write_text(yaml.safe_dump(data, allow_unicode=True), "utf-8")
+    with pytest.raises(InvalidInput, match="calibration_id"):
+        StereoCalibration.load(tmp_path / "elp.yaml")
+    with pytest.raises(InvalidInput):
+        calib.with_disparity_offset(float("nan"), {})
+
+
+def test_version_1_file_loads_without_offset(run_clean, tmp_path):
+    run, options, sessions = run_clean
+    calib = to_calibration(run, sessions, options)
+    data = calib.to_dict()
+    data["version"] = 1
+    del data["correccion_disparidad"]
+    path = tmp_path / "v1.yaml"
+    path.write_text(yaml.safe_dump(data, allow_unicode=True), encoding="utf-8")
+    loaded = StereoCalibration.load(path)
+    assert loaded.calibration_id == calib.calibration_id
+    assert loaded.disparity_offset_px == 0.0
+
+
 def test_load_detects_tampering(run_clean, tmp_path):
     run, options, sessions = run_clean
     path = to_calibration(run, sessions, options).save(tmp_path / "elp.yaml")
