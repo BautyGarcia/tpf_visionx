@@ -6,4 +6,4 @@ while read local_ref local_sha remote_ref remote_sha; do
     exit 1
   fi
 done
-uv run --quiet pytest -q || { echo "Los tests fallan. No se sube."; exit 1; }
+uv run --quiet python -m pytest -q || { echo "Los tests fallan. No se sube."; exit 1; }

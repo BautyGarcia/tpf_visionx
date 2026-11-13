@@ -69,9 +69,17 @@ Claude Code. **Rama:** `b/T03-recepcion` (local).
 editor), no en Git. El repositorio sigue sin datos crudos.
 
 **Problemas.**
-- `uv run pytest` no pudo ejecutarse en Windows: Control de aplicaciones de Windows bloquea
-  `.venv\Scripts\python.exe` (os error 4551). No hay verificación local de los 219 tests en
-  Windows; la evidencia de software sigue siendo la Mac de Bauty y la CI.
+- `uv run pytest` no pudo ejecutarse en Windows: Control de aplicaciones de Windows bloqueaba
+  `.venv\Scripts\python.exe` (os error 4551). Causa: Smart App Control pasó de evaluación a
+  activado (`VerifiedAndReputablePolicyState` 1, estado previo 2); el intérprete base de uv sí
+  corre, pero no el lanzador copiado al `.venv` el 29/10 ni los `.exe` de consola (`pytest.exe`,
+  `visionx.exe`).
+- **Solución:** `.venv` renombrado a `.venv-bloqueado-2026-11-13` (ignorado por Git) y
+  recreado con `uv sync --locked`; el nuevo `python.exe` corre. Para los `.exe` de consola:
+  `uv run python -m pytest` y `uv run python -m visionx` (se agrega `src/visionx/__main__.py`);
+  el hook `pre-push` pasa a `python -m pytest`. No se desactivó Smart App Control.
+- **Resultado en Windows 11 (Python 3.11.18, OpenCV 5.0.0, NumPy 2.4.6):** `python -m pytest`
+  219 aprobados; `ruff check` correcto; `python -m visionx doctor` correcto.
 - El conector de Drive de Claude usa otra cuenta y no ve la carpeta; la lectura se hizo por el
   disco sincronizado.
 
@@ -85,8 +93,8 @@ El límite «estabilidad de δ entre días no medida» sigue vigente para el inf
 **Límites.** No se recalculó la calibración ni se corrió `offset_cinta.py` en Windows. No se
 verificaron modos de la ELP en Windows (pendiente T02).
 
-**Próximo paso propuesto.** Destrabar el entorno Windows (Control de aplicaciones) y correr la
-suite; luego T02 (captura, grabación y replay) sobre la calibración corregida, a confirmar por Tomás.
+**Próximo paso.** T02 (captura, grabación y replay) sobre la calibración corregida, rama
+`b/T02-captura`, pedido por Tomás.
 
 ## 2026-11-13 — Corrección de disparidad implementada y verificada con cinta-s7
 
