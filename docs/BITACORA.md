@@ -40,6 +40,46 @@ En documentación puede escribirse «sin pruebas de software ni mediciones; revi
 y diff». En una medición real, conservar CSV/JSONL/artefacto verificable; un texto sin datos
 no reemplaza la evidencia. No pegar secretos, pesos ni videos en esta bitácora.
 
+## 2026-11-13 — T02: captura USB, grabación, replay y rectificación (sin cámara)
+
+**Tarea:** T02. **Persona/agente:** Tomás / Claude Code. **Rama:** `b/T02-captura` (local, apilada
+sobre `b/T03-recepcion` para tener el hook que corre en Windows).
+
+**Hecho.** Paquete nuevo `src/visionx/camera/`:
+- `UsbStereoSource`: abre la ELP con OpenCV (fourcc antes que tamaño), descarta cuadros de
+  arranque y compara el tamaño recibido con el pedido; si no coincide corta con `SourceError`,
+  porque la ELP cambia de modo sin avisar (BITACORA 2026-11-12). Ante una lectura fallida reabre
+  la cámara hasta `reconnect_attempts` veces; los `frame_id` siguen corriendo.
+- `split_sbs`: separa el cuadro side by side; `camera.swap_eyes` corrige una inversión sin tocar metros.
+- `Recorder` y `ReplaySource`: formato `visionx-grabacion` v1 (manifiesto, `frames.jsonl`,
+  imágenes con SHA-256). El par existe solo cuando su línea está escrita después de los dos ojos.
+  Con cola, los pares que el disco no alcanza a escribir se descartan y quedan contados. El replay
+  conserva la identidad y `replay_original_ns`, y avanza un `ManualClock` con los tiempos grabados.
+- `RectifiedSource`: envuelve cualquier fuente y rectifica con `StereoCalibration` (incluye δ del
+  PR #14); marca `rectified`, `calibration_id` y `geometry_id`.
+- CLI `python -m visionx.camera ver | modos | grabar | verificar`. `modos` reemplaza en Windows al
+  script de Mac, que usa `resource` (solo Unix).
+- Config: `camera.swap_eyes`, `reconnect_attempts` y `warmup_frames`. Docs: TECNICO T02 y ROADMAP.
+
+**Motivo.** Se graba el par sin rectificar para poder rectificar después con otra calibración. El
+índice JSONL con línea por par evita el ojo cruzado ante un corte. La reconexión no devuelve
+`None`, para no confundir un fallo de cámara con el fin de una grabación.
+
+**Evidencia.** Windows 11, Python 3.11.18, OpenCV 5.0.0: `uv run python -m pytest` da 253
+aprobados (34 nuevos en `tests/test_camera.py`: cámara falsa, reconexión, ida y vuelta PNG exacta
+y JPEG aproximada, hash alterado, archivo faltante, índice truncado, cola llena, reloj del replay,
+rectificación con la calibración corregida, CLI `verificar`). `ruff format --check` y
+`ruff check` correctos.
+
+**Límites.** Ninguna prueba con la ELP: no se corrió `ver`, `modos` ni `grabar` con hardware. No
+se midió si JPEG 95 a 3840×1080 sostiene ~60 fps en disco ni la RAM (M2). `capture_ns` queda vacío:
+OpenCV no da una hora de captura confiable. La sincronía entre ojos no se puede verificar con este
+código.
+
+**Próximo paso.** Con la ELP conectada a Windows: `ver` (tapar un lente), `modos` y
+`grabar --segundos 600`, después `verificar`; registrar FPS, huecos, descartes y backend
+(`dshow`/`msmf`). Entregar una grabación corta a Bauty por Drive para T04/T05.
+
 ## 2026-11-13 — Recepción en Windows de la calibración ELP y sus imágenes
 
 **Tarea:** T03 (recepción del consumidor, T01 para el almacén). **Persona/agente:** Tomás /

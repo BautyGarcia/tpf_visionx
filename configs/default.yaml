@@ -8,7 +8,10 @@ camera:
   backend: auto             # auto | avfoundation (macOS) | dshow | msmf (Windows) | v4l2 (Linux)
   capture: [3840, 1080]     # par lado a lado, MJPEG
   fourcc: MJPG
-  fps: 30
+  fps: 30                   # pedido al driver; la ELP entrega ~60 y CAP_PROP_FPS informa 5: medir
+  swap_eyes: false          # true solo si `python -m visionx.camera ver` muestra los ojos invertidos
+  reconnect_attempts: 3     # reaperturas antes de declarar la cámara perdida (SourceError)
+  warmup_frames: 5          # cuadros descartados al abrir
   calibration: configs/calib/elp-2026-11-11-corregida.yaml  # s6 + corrección de disparidad, BITACORA 2026-11-13
 
 depth:
